@@ -11,40 +11,7 @@ library(readr)
 
 
 
-# computing the balanced mean squares for the data.
-balanced_mean_squares <- function(data){
-  #making the data into a dataframe format
-  data_frame <- data.frame(data1)
 
-  #finding the number of rows to use for computing the mean
-  n <- nrow(data_frame)
-
-  #calculating the mean across all the data measurements
-  ybar <- data_frame %>%
-    summarize(ybar = mean(Y))
-
-  #calculating the mean across all the common parts
-  ybarI <- data_frame %>%
-    group_by(P) %>%
-    summarize(ybar = mean(Y))
-
-  #calculating the mean across all the common operators
-  ybarJ <- data_frame %>%
-    group_by(O) %>%
-    summarize(ybar = mean(Y))
-
-  SSp <- data_frame %>%
-    group_by(P) %>%
-    summarise(ss=sum(((mean(Y)-Y))^2))
-
-  SSo <- data_frame %>%
-    group_by(O) %>%
-    summarise(ss=sum(((mean(Y)-Y))^2))
-
-  SSe <- data_frame %>%
-    group_by(O,P) %>%
-    summarise(ss=sum(((mean(Y)-Y))^2))
-}
 
 
 ui <- navbarPage(title = "Shiny Gague R&R",

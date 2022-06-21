@@ -165,7 +165,7 @@ server <- function(input, output){
       summarize(SSE=sum(SSe))})
   SST<-reactive({data_frame()%>%
       summarize(var = var(Y))%>%
-      summarize(SST = var*(n-1))})
+      summarize(MSPO = var*(n-1))}) #relabeled for the convention
 
   output$dataSelect <- renderText({
     paste("data selected", input$data)
@@ -184,14 +184,14 @@ server <- function(input, output){
     SSPO <- SST()-sum(SSP(), SSO(), SSE())
 
     if (input$meanSums == "MSP"){
-      paste(MSP())
+      return(MSP())
     }else if(input$meanSums == "MSO"){
-      paste(MSO())
+      return(MSO())
     }else if(input$meanSums == "MSE"){
-      paste(MSE())
+      return(MSE())
     }else if(input$meanSums == "MSPO"){
       MSPO <- SSPO/((p-1)*(o-1))
-      paste(MSPO)
+      return(MSPO)
     }
   })
 
@@ -219,25 +219,13 @@ server <- function(input, output){
     s2_gauge <- (MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r)
 
     if (input$est == "s2_repeat"){
-        paste(MSE)
+        return(MSE)
     }else if (input$est == "s2_p"){
-        if (s2_p > 0){
-          paste(s2_p)
-        }else{
-          paste(0)
-        }
+        return(max(unlist(0,s2_p)))
     }else if (input$est == "s2_o"){
-        if(s2_o > 0){
-          paste(s2_o)
-        }else{
-          paste(0)
-        }
+        paste(max(0,s2_o))
     }else if (input$est == "s2_po"){
-      if(s2_po > 0){
-        paste(s2_po)
-      }else{
-        paste(0)
-      }
+      paste(unlist(max(0,s2_po)))
     }else if (input$est == "s2_tot"){
       paste(s2_tot)
     }else if (input$est == "s2_repro"){
@@ -429,69 +417,61 @@ server <- function(input, output){
 
       gpq_repeat <- (p * o * (r - 1) * MSE) / W4
 
-      # c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
-      # "s2_repro", "s2_gauge", "pg_ratio","tg_ratio",
-      # "pr_ratio")
       probs <- c(alpha/2, 1 - alpha/2)
 
       if(input$conf == "s2_repeat"){
         bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
-        paste(bounds)
-        lower <- MSE - bounds
+        lower <- MSE - max(0,bounds)
         upper <- MSE + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_p"){
         bounds <- quantile(gpq_part, probs, na.rm = TRUE)
-        paste(bounds)
-        lower <- s2_p - bounds
+        lower <- s2_p - max(0,bounds)
         upper <- s2_p + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_o"){
         bounds <- quantile(gpq_oper, probs, na.rm = TRUE)
-        paste(bounds)
-        lower <- s2_o - bounds
+        lower <- s2_o - max(0,bounds)
         upper <- s2_o + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_po"){
         bounds <- quantile(gpq_po, probs, na.rm = TRUE)
-        paste(bounds)
-        lower <- s2_po - bounds
+        lower <- s2_po - max(0,bounds)
         upper <- s2_po + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_tot"){
         bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
         paste(bounds)
-        lower <- s2_tot - bounds
+        lower <- s2_tot - max(0,bounds)
         upper <- s2_tot + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_repro"){
         bounds <- quantile(gpq_repro, probs, na.rm = TRUE)
-        paste(bounds)
-        lower <- s2_repro - bounds
+        lower <- s2_repro - max(0,bounds)
         upper <- s2_repro + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_gauge"){
         bounds <- quantile(gpq_gauge, probs, na.rm = TRUE)
         quantile(gpq_gauge, probs, na.rm = TRUE)
-        lower <- s2_gauge - bounds
+        lower <- s2_gauge - max(0,bounds)
         upper <- s2_gauge + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "pg_ratio"){
         gpq_part_gauge <- gpq_part / gpq_gauge
         bounds <- quantile(gpq_part_gauge, probs, na.rm = TRUE)
-        lower <- pg_ratio - bounds
+        lower <- pg_ratio - max(0,bounds)
         upper <- pg_ratio + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "tg_ratio"){
         gpq_gauge_total <- gpq_gauge / gpq_total
         bounds <- quantile(gpq_gauge_total, probs, na.rm = TRUE)
-        lower <- gt_ratio - bounds
+        lower <- gt_ratio - max(0,bounds)
         upper <- gt_ratio + bounds
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "pr_ratio"){
         gpq_part_repeat <- gpq_part / gpq_repeat
         bounds <- quantile(gpq_part_repeat, probs, na.rm = TRUE)
-        lower <- pr_ratio - bounds
+        lower <- pr_ratio - max(0,bounds)
         upper <- pr_ratio + bounds
         paste("lower:", lower, " upper:", upper)
       }

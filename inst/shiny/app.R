@@ -30,52 +30,75 @@ ui <- navbarPage(title = "Shiny Gague R&R",
                  tabPanel(
                    title="Mean Sum of Squares",
                    fluidPage(
-                     radioButtons(
-                       inputId = "meanSums",
-                       label = "chose a measurement",
-                       choices = c("MSP", "MSO", "MSE", "MSPO")
-                     ), #end radioButtons
-                     tableOutput(
-                       outputId = "tableMeanSum"
-                     ) #end tableOutput
+                     sidebarLayout(
+                       sidebarPanel(
+                         radioButtons(
+                           inputId = "meanSums",
+                           label = "chose a measurement",
+                           choices = c("MSP", "MSO", "MSE", "MSPO")
+                         ) #end radioButtons
+                       ),#end siderbarPanel
+                       mainPanel(
+                         tableOutput(
+                           outputId = "tableMeanSum"
+                         ) #end tableOutput
+                       )#end mainPanel
+                     )#end siderbarLayout
                    ) #end fluidPage
                  ), #end Mean Sum of Squares Panel
                  tabPanel(
                    title = "Point Estimates",
                    fluidPage(
-                     radioButtons(
-                       inputId = "est",
-                       label = "choose an estimate",
-                       choices = c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
-                                   "s2_repro", "s2_gauge", "pg_ratio","gt_ratio",
-                                   "pr_ratio")
-                     ),# end radioButtons
-                     tableOutput(
-                       outputId = "tableEst"
-                     ) # end tableOutput
+                     sidebarLayout(
+                       sidebarPanel(
+                         radioButtons(
+                           inputId = "est",
+                           label = "choose an estimate",
+                           choices = c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
+                                       "s2_repro", "s2_gauge", "pg_ratio","gt_ratio",
+                                       "pr_ratio")
+                         )# end radioButtons
+                       ), #end sidebarPanel
+                       mainPanel(
+                         tableOutput(
+                           outputId = "tableEst"
+                         ) # end tableOutput
+                       ) #end mainPanel
+                     ) #end sidebar Layout
                    ) # end fluidPage
                  ), # end tabPanel
                  tabPanel(
                    title = "Confidence Intervals",
                    fluidPage(
-                    radioButtons(
-                      inputId = "conf",
-                      label = "choose an estimator you want the confidence interval for",
-                      choices = c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
-                                 "s2_repro", "s2_gauge", "pg_ratio","gt_ratio",
-                                 "pr_ratio")
-                    ),# end radioButtons
-                    sliderInput(
-                      inputId = "alpha",
-                      label = "chose a value for alpha",
-                      min = 0,
-                      max = 1,
-                      value = 0.90,
-                      step = 0.05
-                    ),# end sliderInput
-                    tableOutput(
-                      outputId = "tableConf"
-                      ) # end tableOutput
+                     sidebarLayout(
+                       sidebarPanel(
+                         radioButtons(
+                           inputId = "conf",
+                           label = "choose an estimator you want the confidence interval for",
+                           choices = c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
+                                       "s2_repro", "s2_gauge", "pg_ratio","tg_ratio",
+                                       "pr_ratio")
+                         ),# end radioButtons
+                         radioButtons(
+                           inputId = "type",
+                           label = "choose the type of estimator you want calculated",
+                           choices = c("mls", "gpq")
+                         ), #end radioButtons
+                         sliderInput(
+                           inputId = "alpha",
+                           label = "chose a value for alpha",
+                           min = 0,
+                           max = 1,
+                           value = 0.90,
+                           step = 0.05
+                         )# end sliderInput
+                       ),#end sidebarPanel
+                       mainPanel(
+                         tableOutput(
+                           outputId = "tableConf"
+                         ) # end tableOutput
+                       ) #end mainPanel
+                     )#end sidebarLayout
                    ) # end fluidPage
                  ) # end tabPanel
 ) #end navbarPage
@@ -148,7 +171,6 @@ server <- function(input, output){
     paste("data selected", input$data)
   }) # end output$dataSelect
 
-  #c("MSP", "MSO", "MSE", "MSPO")
   output$tableMeanSum <- renderTable({
     n <-  nrow(data_frame())
     p <- nrow(data_frame() %>%
@@ -266,6 +288,7 @@ server <- function(input, output){
     # alpha value
     alpha <- input$alpha
 
+    if (input$type == "mls"){
     # coefficients
     G1 <- 1 - qf(alpha/2, Inf, p - 1)
     G2 <- 1 - qf(alpha/2, Inf, o - 1)
@@ -299,8 +322,9 @@ server <- function(input, output){
     H34 <- ((1 - F8)^2 - H3^2 * F8^2 - G4^2) / F8
 
     if(input$conf == "s2_repeat"){
-
-      paste("interval")
+      repeat.lower <- (1 - G4) * MSE
+      repeat.upper <- (1 + H4) * MSE
+      paste("lower:", repeat.lower, " upper:",repeat.upper)
     }else if(input$conf =="s2_p"){
       v_lp <- G1^2 * MSP^2 + H3^2 * MSPO^2 + G13 * MSP * MSPO
       v_up <- H1^2 * MSP^2 + G3^2 * MSPO^2 + H13 * MSP * MSPO
@@ -358,14 +382,122 @@ server <- function(input, output){
       pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
         (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
       paste("lower:", pg_ratio_lower, " upper:", pg_ratio_upper)
-    }else if(input$conf =="gt_ratio"){
-      paste("interval")
-    }else if(input$conf =="pr_ratio"){
-      paste("interval")
+    }else if(input$conf =="tg_ratio"){
+      pg_ratio_lower <- (p * (1 - G1) * (MSP - F1 * MSPO)) /
+        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO)
+      pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
+        (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
+      tg_ratio_lower <- 1 + pg_ratio_lower
+      tg_ratio_upper <- 1 + pg_ratio_upper
+      paste("lower:", tg_ratio_lower, " upper:", tg_ratio_upper)
+    }else if(input$conf =="pr_ratio"){MSPO
+      pr_ratio_lower <- (MSPO / (o * r * MSE * F9)) *
+        ((MSP / MSPO) - (1 / (1 - G1)) + (MSPO * F1 * (1 - F1 * (1 - G1))) / (MSP * (1 - G1)))
+      pr_ratio_upper <- (MSPO / (o * r * MSE * F10)) *
+        ((MSP / MSPO) - (1 / (1 + H1)) + (MSPO * F2 * (1 - F2 * (1 + H1))) / (MSP * (1 + H1)))
+      paste("lower:", pr_ratio_lower, " upper:", pr_ratio_upper)
+    }
+    }
+    else if(input$type == "gpq"){
+      N <- 1e5
+      W1 <- rchisq(N, p - 1)
+      W2 <- rchisq(N, o - 1)
+      W3 <- rchisq(N, (o - 1) * (p - 1))
+      W4 <- rchisq(N, p * o * (r - 1))
+
+      gpq_part  <- pmax(0, ((p - 1) * MSP) / (o * r * W1) -
+                          ((p - 1) * (o - 1) * MSPO) / (o * r * W3))
+
+      gpq_oper <- pmax(0, ((o - 1) * MSO) / (p * r * W2) -
+                         ((p - 1) * (o - 1) * MSPO) / (p * r * W3))
+
+      gpq_po <- pmax(0, ((p - 1) * (o - 1) * MSPO) / (r * W3) -
+                       (p * o * (r - 1) * MSE) / (r * W4))
+
+      gpq_total <- ((p - 1) * MSP) / (o * r * W1) + ((o - 1) * MSO) / (p * r * W2) +
+        (((p * o - p - o) * (p - 1) * (o - 1)) * MSPO) / (p * o * r * W3) +
+        (p * o * (r - 1)^2 * MSE) / (r * W4)
+
+      gpq_repro <- pmax(0,
+                        ((o - 1) * MSO) / (p * r * W2) +
+                          (1 / r) * (1 - 1/ p) * ((p - 1) * ((o - 1) * MSPO) / W3) -
+                          (p * o * (r - 1) * MSE) / (r * W4) )
+
+      gpq_gauge <- ((o - 1) * MSO) / (p * r * W2) +
+        ((p - 1)^2 * (o - 1) * MSPO) / (p * r * W3) +
+        (p * o * (r - 1)^2 * MSE) / (r * W4)
+
+      gpq_repeat <- (p * o * (r - 1) * MSE) / W4
+
+      # c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
+      # "s2_repro", "s2_gauge", "pg_ratio","tg_ratio",
+      # "pr_ratio")
+      probs <- c(alpha/2, 1 - alpha/2)
+
+      if(input$conf == "s2_repeat"){
+        bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
+        paste(bounds)
+        lower <- MSE - bounds
+        upper <- MSE + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "s2_p"){
+        bounds <- quantile(gpq_part, probs, na.rm = TRUE)
+        paste(bounds)
+        lower <- s2_p - bounds
+        upper <- s2_p + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "s2_o"){
+        bounds <- quantile(gpq_oper, probs, na.rm = TRUE)
+        paste(bounds)
+        lower <- s2_o - bounds
+        upper <- s2_o + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "s2_po"){
+        bounds <- quantile(gpq_po, probs, na.rm = TRUE)
+        paste(bounds)
+        lower <- s2_po - bounds
+        upper <- s2_po + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "s2_tot"){
+        bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
+        paste(bounds)
+        lower <- s2_tot - bounds
+        upper <- s2_tot + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "s2_repro"){
+        bounds <- quantile(gpq_repro, probs, na.rm = TRUE)
+        paste(bounds)
+        lower <- s2_repro - bounds
+        upper <- s2_repro + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "s2_gauge"){
+        bounds <- quantile(gpq_gauge, probs, na.rm = TRUE)
+        quantile(gpq_gauge, probs, na.rm = TRUE)
+        lower <- s2_gauge - bounds
+        upper <- s2_gauge + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "pg_ratio"){
+        gpq_part_gauge <- gpq_part / gpq_gauge
+        bounds <- quantile(gpq_part_gauge, probs, na.rm = TRUE)
+        lower <- pg_ratio - bounds
+        upper <- pg_ratio + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "tg_ratio"){
+        gpq_gauge_total <- gpq_gauge / gpq_total
+        bounds <- quantile(gpq_gauge_total, probs, na.rm = TRUE)
+        lower <- gt_ratio - bounds
+        upper <- gt_ratio + bounds
+        paste("lower:", lower, " upper:", upper)
+      }else if(input$conf == "pr_ratio"){
+        gpq_part_repeat <- gpq_part / gpq_repeat
+        bounds <- quantile(gpq_part_repeat, probs, na.rm = TRUE)
+        lower <- pr_ratio - bounds
+        upper <- pr_ratio + bounds
+        paste("lower:", lower, " upper:", upper)
+      }
     }
   })
 }
 
 shinyApp(ui, server)
-
 

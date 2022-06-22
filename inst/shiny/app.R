@@ -100,14 +100,55 @@ ui <- navbarPage(title = "Shiny Gague R&R",
                        ) #end mainPanel
                      )#end sidebarLayout
                    ) # end fluidPage
-                 ) # end tabPanel
+                 ), # end tabPanel
+                 tabPanel(
+                   title = "F-values",
+                   fluidPage(
+                   sidebarLayout(
+                     sidebarPanel(
+                       radioButtons(
+                         inputId = "fVal",
+                         label = "choose a f-value to compute",
+                         choices = c("operator", "part", "operator by part")
+                       ) #end radioButtons
+                     ), #end sidebarPanel
+                     mainPanel(
+                       tableOutput(
+                         outputId = "tableF"
+                       ) # end tableOutput
+                     ) #end mainPanel
+                   ) # end sidebarLayout
+                   ) # end fluidPage
+                 ), #end tabPanel
+                 tabPanel(
+                   title = "Variance",
+                   fluidPage(
+                     sidebarLayout(
+                       sidebarPanel(
+                         radioButtons(
+                           inputId = "var",
+                           label = "choose a variance to compute",
+                           choices = c("repeatability", "operators*parts",
+                                       "parts","opertors", "total", "R&R")
+                         ) #end radioButtons
+                       ), #end sidebarPanel
+                       mainPanel(
+                         tableOutput(
+                           outputId = "tableVar"
+                         ), # end tableOutput
+                         tableOutput(
+                           outputId = "percent"
+                         )
+                       ) #end mainPanel
+                     ) # end sidebarLayout
+                   ) # end fluidPage
+                 ) #end tabPanel
 ) #end navbarPage
 
 server <- function(input, output){
   data_frame <- reactive({
     if(input$data == "kf_rr.csv"){
-      data_frame <- read_delim("kf_rr.csv", delim="\t")
-      data_frame <- data.frame(data_frame)
+      data_frame <-  as.data.frame(read_delim("kf_rr.csv", delim="\t"))
     } # end if statement
     else if (input$data == "long_houf_berman.csv"){
       data_frame <- read_csv("long_houf_berman.csv") %>%
@@ -219,32 +260,28 @@ server <- function(input, output){
     s2_gauge <- (MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r)
 
     if (input$est == "s2_repeat"){
-        return(MSE)
+        paste(MSE)
     }else if (input$est == "s2_p"){
-        return(max(unlist(0,s2_p)))
+        paste(pmax(0,s2_p))
     }else if (input$est == "s2_o"){
-        paste(max(0,s2_o))
+        paste(pmax(0,s2_o))
     }else if (input$est == "s2_po"){
-      paste(unlist(max(0,s2_po)))
+      paste(pmax(0,s2_po))
     }else if (input$est == "s2_tot"){
-      paste(s2_tot)
+      paste(pmax(0,s2_tot))
     }else if (input$est == "s2_repro"){
-      if(s2_repro > 0){
-        paste(s2_repro)
-      }else{
-        paste(0)
-      }
+      paste(pmax(0,s2_repro))
     }else if(input$est == "s2_gauge"){
-      paste(s2_gauge)
+      paste(pmax(0,s2_gauge))
     }else if(input$est == "pg_ratio"){
       pg_ratio <- s2_p / s2_gauge
-      paste(pg_ratio)
+      paste(pmax(0,pg_ratio))
     }else if(input$est == "gt_ratio"){
       gt_ratio <- s2_gauge/s2_tot
-      paste(gt_ratio)
+      paste(pmax(0,gt_ratio))
     }else if(input$est == "pr_ratio"){
       pr_ratio <- s2_p/MSE
-      paste(pr_ratio)
+      paste(pmax(0,pr_ratio))
     }
   })
   output$tableConf <- renderTable({
@@ -274,7 +311,7 @@ server <- function(input, output){
     pr_ratio <- s2_p/MSE
 
     # alpha value
-    alpha <- input$alpha
+    alpha <- 1- input$alpha
 
     if (input$type == "mls"){
     # coefficients
@@ -310,25 +347,25 @@ server <- function(input, output){
     H34 <- ((1 - F8)^2 - H3^2 * F8^2 - G4^2) / F8
 
     if(input$conf == "s2_repeat"){
-      repeat.lower <- (1 - G4) * MSE
+      repeat.lower <- pmax(0,(1 - G4) * MSE)
       repeat.upper <- (1 + H4) * MSE
       paste("lower:", repeat.lower, " upper:",repeat.upper)
     }else if(input$conf =="s2_p"){
       v_lp <- G1^2 * MSP^2 + H3^2 * MSPO^2 + G13 * MSP * MSPO
       v_up <- H1^2 * MSP^2 + G3^2 * MSPO^2 + H13 * MSP * MSPO
-      parts.lower <- s2_p - sqrt(v_lp) / (o * r)
+      parts.lower <- pmax(0, s2_p - sqrt(v_lp) / (o * r))
       parts.upper <- s2_p + sqrt(v_up) / (o * r)
       paste("lower:", parts.lower, " upper:",parts.upper)
     }else if(input$conf =="s2_o"){
       v_lo <- G2^2 * MSO^2 + H3^2 * MSPO^2 + G23 * MSO * MSPO
       v_uo <- H2^2 * MSO^2 + G3^2 * MSPO^2 + H23 * MSO * MSPO
-      oper.lower <- s2_o - sqrt(v_lo) / (p * r)
+      oper.lower <- pmax(0, s2_o - sqrt(v_lo) / (p * r))
       oper.upper <- s2_o + sqrt(v_uo) / (p * r)
       paste("lower:", oper.lower, " upper:", oper.upper)
     }else if(input$conf =="s2_po"){
       v_lpo <- G3^2 * MSPO^2 + H4^2 * MSE^2 + G34 * MSPO * MSE
       v_upo <- H3^2 * MSPO^2 + G4^2 * MSE^2 + H34 * MSPO * MSE
-      po.lower <- s2_po - sqrt(v_lpo) / r
+      po.lower <- pmax(0, s2_po - sqrt(v_lpo) / r)
       po.upper <- s2_po + sqrt(v_upo) / r
       paste("lower:", po.lower, " upper:", po.upper)
     }else if(input$conf =="s2_tot"){
@@ -340,7 +377,7 @@ server <- function(input, output){
         H2^2 * o^2 * MSO^2 +
         H3^2 * (p * o - p - o)^2 * MSPO^2 +
         H4^2 * (p * o)^2 * (r - 1)^2 * MSE^2
-      total.lower <- s2_tot - sqrt(v_lt) / (p * o * r)
+      total.lower <- pmax(0, s2_tot - sqrt(v_lt) / (p * o * r))
       total.upper <- s2_tot + sqrt(v_ut) / (p * o * r)
       paste("lower:", total.lower, " upper:", total.upper)
     }else if(input$conf =="s2_repro"){
@@ -355,32 +392,32 @@ server <- function(input, output){
                     G4^2 * p^2 * MSE^2 +
                     H24 * p * MSO * MSE +
                     H34 * (p - 1) * p * MSPO * MSE) / (p * r)^2
-      repro.lower <- s2_repro - sqrt(v_lrepro)
+      repro.lower <- pmax(0, s2_repro - sqrt(v_lrepro))
       repro.upper <- s2_repro + sqrt(v_urepo)
       paste("lower:", repro.lower, " upper:", repro.upper)
     }else if(input$conf =="s2_gauge"){
       v_lm <- G2^2 * MSO^2 + G3^2 * (p - 1)^2 * MSPO^2 + G4^2 * p^2 * (r - 1)^2 * MSE^2
       v_um <- H2^2 * MSO^2 + H3^2 * (p - 1)^2 * MSPO^2 + H4^2 * p^2 * (r - 1)^2 * MSE^2
-      gauge.lower <- s2_gauge - sqrt(v_lm) / (p * r)
+      gauge.lower <- pmax(0, s2_gauge - sqrt(v_lm) / (p * r))
       gauge.upper <- s2_gauge + sqrt(v_um) / (p * r)
       paste("lower:", gauge.lower, " upper:", gauge.upper)
     }else if(input$conf =="pg_ratio"){
-      pg_ratio_lower <- (p * (1 - G1) * (MSP - F1 * MSPO)) /
-        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO)
+      pg_ratio_lower <- pmax(0, (p * (1 - G1) * (MSP - F1 * MSPO)) /
+        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO))
       pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
         (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
       paste("lower:", pg_ratio_lower, " upper:", pg_ratio_upper)
     }else if(input$conf =="tg_ratio"){
-      pg_ratio_lower <- (p * (1 - G1) * (MSP - F1 * MSPO)) /
-        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO)
+      pg_ratio_lower <- pmax(0, (p * (1 - G1) * (MSP - F1 * MSPO)) /
+        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO))
       pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
         (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
       tg_ratio_lower <- 1 + pg_ratio_lower
       tg_ratio_upper <- 1 + pg_ratio_upper
       paste("lower:", tg_ratio_lower, " upper:", tg_ratio_upper)
     }else if(input$conf =="pr_ratio"){MSPO
-      pr_ratio_lower <- (MSPO / (o * r * MSE * F9)) *
-        ((MSP / MSPO) - (1 / (1 - G1)) + (MSPO * F1 * (1 - F1 * (1 - G1))) / (MSP * (1 - G1)))
+      pr_ratio_lower <- pmax(0, (MSPO / (o * r * MSE * F9)) *
+        ((MSP / MSPO) - (1 / (1 - G1)) + (MSPO * F1 * (1 - F1 * (1 - G1))) / (MSP * (1 - G1))))
       pr_ratio_upper <- (MSPO / (o * r * MSE * F10)) *
         ((MSP / MSPO) - (1 / (1 + H1)) + (MSPO * F2 * (1 - F2 * (1 + H1))) / (MSP * (1 + H1)))
       paste("lower:", pr_ratio_lower, " upper:", pr_ratio_upper)
@@ -421,60 +458,152 @@ server <- function(input, output){
 
       if(input$conf == "s2_repeat"){
         bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
-        lower <- MSE - max(0,bounds)
-        upper <- MSE + bounds
+        lower <- MSE - bounds[1]
+        upper <- MSE + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_p"){
         bounds <- quantile(gpq_part, probs, na.rm = TRUE)
-        lower <- s2_p - max(0,bounds)
-        upper <- s2_p + bounds
+        lower <- s2_p - bounds[1]
+        upper <- s2_p + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_o"){
         bounds <- quantile(gpq_oper, probs, na.rm = TRUE)
-        lower <- s2_o - max(0,bounds)
-        upper <- s2_o + bounds
+        lower <- s2_o - bounds[1]
+        upper <- s2_o + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_po"){
         bounds <- quantile(gpq_po, probs, na.rm = TRUE)
-        lower <- s2_po - max(0,bounds)
-        upper <- s2_po + bounds
+        lower <- s2_po - bounds[1]
+        upper <- s2_po + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_tot"){
         bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
         paste(bounds)
-        lower <- s2_tot - max(0,bounds)
-        upper <- s2_tot + bounds
+        lower <- s2_tot - bounds[1]
+        upper <- s2_tot + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_repro"){
         bounds <- quantile(gpq_repro, probs, na.rm = TRUE)
-        lower <- s2_repro - max(0,bounds)
-        upper <- s2_repro + bounds
+        lower <- s2_repro - bounds[1]
+        upper <- s2_repro + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "s2_gauge"){
         bounds <- quantile(gpq_gauge, probs, na.rm = TRUE)
         quantile(gpq_gauge, probs, na.rm = TRUE)
-        lower <- s2_gauge - max(0,bounds)
-        upper <- s2_gauge + bounds
+        lower <- s2_gauge - bounds[1]
+        upper <- s2_gauge + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "pg_ratio"){
         gpq_part_gauge <- gpq_part / gpq_gauge
         bounds <- quantile(gpq_part_gauge, probs, na.rm = TRUE)
-        lower <- pg_ratio - max(0,bounds)
-        upper <- pg_ratio + bounds
+        lower <- pg_ratio - bounds[1]
+        upper <- pg_ratio + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "tg_ratio"){
         gpq_gauge_total <- gpq_gauge / gpq_total
         bounds <- quantile(gpq_gauge_total, probs, na.rm = TRUE)
-        lower <- gt_ratio - max(0,bounds)
-        upper <- gt_ratio + bounds
+        lower <- gt_ratio - bounds[1]
+        upper <- gt_ratio + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }else if(input$conf == "pr_ratio"){
         gpq_part_repeat <- gpq_part / gpq_repeat
         bounds <- quantile(gpq_part_repeat, probs, na.rm = TRUE)
-        lower <- pr_ratio - max(0,bounds)
-        upper <- pr_ratio + bounds
+        lower <- pr_ratio - bounds[1]
+        upper <- pr_ratio + bounds[2]
         paste("lower:", lower, " upper:", upper)
       }
+    }
+  })
+  output$tableF <- renderTable({
+    n <- nrow(data_frame())
+    p <- nrow(data_frame() %>%
+                group_by(P) %>%
+                summarize(ybar = mean(Y)))
+    o <- nrow(data_frame() %>%
+                group_by(O) %>%
+                summarize(ybar = mean(Y)))
+    r <- n/(o*p)
+    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSPO <- SSPO/((p-1)*(o-1))
+    if(input$fVal == "part"){
+      f <- MSO()/MSPO
+      paste(f)
+    }else if(input$fVal == "operator"){
+      f <- MSP()/MSPO
+      paste(f)
+    }else if(input$fVal == "operator by part"){
+      f <- MSPO/MSE()
+      paste(f)
+    }
+  })
+  output$tableVar <- renderTable({
+    n <- nrow(data_frame())
+    p <- nrow(data_frame() %>%
+                group_by(P) %>%
+                summarize(ybar = mean(Y)))
+    o <- nrow(data_frame() %>%
+                group_by(O) %>%
+                summarize(ybar = mean(Y)))
+    r <- n/(o*p)
+    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSPO <- SSPO/((p-1)*(o-1))
+    # choices = c("repeatability", "operators*parts",
+    #"parts","opertors")
+    if (input$var == "repeatability"){
+      var <- MSE()
+      paste(pmax(0,var))
+    }else if (input$var == "operators*parts"){
+      var <- MSPO - MSE()
+      paste(pmax(0,var))
+    }else if (input$var == "parts"){
+      var <- (MSP()- MSPO)/(o *r)
+      paste(pmax(0,var))
+    }else if (input$var == "opertors"){
+      var <- MSO()-MSPO/(p*r)
+      paste(pmax(0,var))
+    }else if (input$var == "R&R"){
+      var <- MSE() + (MSO()-MSPO/(p*r))
+      paste(pmax(0,var))
+    } else if (input$var == "total"){
+      var <- pmax(0,MSE()) +
+        pmax(0,((MSP()- MSPO)/(o *r))) +
+        pmax(0,(MSO()-MSPO/(p*r))) +
+        pmax(0, MSPO - MSE())
+      paste(var)
+    }
+  })
+  output$percent <- renderTable({
+    n <- nrow(data_frame())
+    p <- nrow(data_frame() %>%
+                group_by(P) %>%
+                summarize(ybar = mean(Y)))
+    o <- nrow(data_frame() %>%
+                group_by(O) %>%
+                summarize(ybar = mean(Y)))
+    r <- n/(o*p)
+    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSPO <- SSPO/((p-1)*(o-1))
+    total<- (pmax(0,MSE()) +
+      pmax(0,((MSP()- MSPO)/(o *r))) +
+      pmax(0,(MSO()-MSPO/(p*r))) +
+      pmax(0, MSPO - MSE()))
+    if (input$var == "repeatability"){
+      per <- MSE()
+      paste((pmax(0,per)/total)*100)
+    }else if (input$var == "operators*parts"){
+      per <- (MSPO - MSE())
+      paste((pmax(0,per)/total)*100)
+    }else if (input$var == "parts"){
+      per <- ((MSP()- MSPO)/(o *r))
+      paste((pmax(0,per)/total)*100)
+    }else if (input$var == "opertors"){
+      per <- (MSO()-MSPO/(p*r))
+      paste((pmax(0,per)/total)*100)
+    }else if (input$var == "R&R"){
+      per <- (MSE() + (MSO()-MSPO/(p*r)))
+      paste((pmax(0,per)/total)*100)
+    }else if (input$var == "total"){
+      paste(100)
     }
   })
 }

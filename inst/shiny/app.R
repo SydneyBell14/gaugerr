@@ -74,11 +74,11 @@ ui <- navbarPage(title = "Shiny Gague R&R",
                        sidebarPanel(
                          radioButtons(
                            inputId = "conf",
-                           label = "choose an estimator you want the confidence interval for",
+                           label = "choose the type of estimator you want calculated",
                            choices = c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
-                                       "s2_repro", "s2_gauge", "pg_ratio","tg_ratio",
+                                       "s2_repro", "s2_gauge", "pg_ratio","gt_ratio",
                                        "pr_ratio")
-                         ),# end radioButtons
+                         ), #end radioButtons
                          radioButtons(
                            inputId = "type",
                            label = "choose the type of estimator you want calculated",
@@ -300,21 +300,21 @@ server <- function(input, output){
     SSPO <- SST()-sum(SSP(), SSO(), SSE())
     MSPO <- SSPO/((p-1)*(o-1))
 
-    s2_p <-(MSP-MSPO)/(o*r)
-    s2_o <- (MSO-MSPO)/(p*r)
-    s2_po <- (MSPO-MSE)/r
-    s2_tot <- (p*MSP+o*MSO+(p*o-p-o)*MSPO+p*o*(r-1)*MSE)/(p*o*r)
-    s2_repro <- (MSO+(p-1)*MSPO-p*MSE)/(p*r)
-    s2_gauge <- (MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r)
-    pg_ratio <- s2_p / s2_gauge
-    gt_ratio <- s2_gauge/s2_tot
-    pr_ratio <- s2_p/MSE
+    s2_p <-pmax(0,(MSP-MSPO)/(o*r))
+    s2_o <- pmax(0,(MSO-MSPO)/(p*r))
+    s2_po <- pmax(0,(MSPO-MSE)/r)
+    s2_tot <- pmax(0,(p*MSP+o*MSO+(p*o-p-o)*MSPO+p*o*(r-1)*MSE)/(p*o*r))
+    s2_repro <- pmax(0,(MSO+(p-1)*MSPO-p*MSE)/(p*r))
+    s2_gauge <- pmax(0,(MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r))
+    pg_ratio <- pmax(0,s2_p / s2_gauge)
+    gt_ratio <- pmax(0,s2_gauge/s2_tot)
+    pr_ratio <- pmax(0,s2_p/MSE)
 
     # alpha value
     alpha <- 1- input$alpha
 
-    if (input$type == "mls"){
     # coefficients
+    if (input$type == "mls"){
     G1 <- 1 - qf(alpha/2, Inf, p - 1)
     G2 <- 1 - qf(alpha/2, Inf, o - 1)
     G3 <- 1 - qf(alpha/2, Inf, (p-1) * (o-1))
@@ -346,82 +346,87 @@ server <- function(input, output){
     H24 <- ((1 - F12)^2 - H2^2 * F12^2 - G4^2) / F12
     H34 <- ((1 - F8)^2 - H3^2 * F8^2 - G4^2) / F8
 
-    if(input$conf == "s2_repeat"){
-      repeat.lower <- pmax(0,(1 - G4) * MSE)
-      repeat.upper <- (1 + H4) * MSE
-      paste("lower:", repeat.lower, " upper:",repeat.upper)
-    }else if(input$conf =="s2_p"){
-      v_lp <- G1^2 * MSP^2 + H3^2 * MSPO^2 + G13 * MSP * MSPO
-      v_up <- H1^2 * MSP^2 + G3^2 * MSPO^2 + H13 * MSP * MSPO
-      parts.lower <- pmax(0, s2_p - sqrt(v_lp) / (o * r))
-      parts.upper <- s2_p + sqrt(v_up) / (o * r)
-      paste("lower:", parts.lower, " upper:",parts.upper)
-    }else if(input$conf =="s2_o"){
-      v_lo <- G2^2 * MSO^2 + H3^2 * MSPO^2 + G23 * MSO * MSPO
-      v_uo <- H2^2 * MSO^2 + G3^2 * MSPO^2 + H23 * MSO * MSPO
-      oper.lower <- pmax(0, s2_o - sqrt(v_lo) / (p * r))
-      oper.upper <- s2_o + sqrt(v_uo) / (p * r)
-      paste("lower:", oper.lower, " upper:", oper.upper)
-    }else if(input$conf =="s2_po"){
-      v_lpo <- G3^2 * MSPO^2 + H4^2 * MSE^2 + G34 * MSPO * MSE
-      v_upo <- H3^2 * MSPO^2 + G4^2 * MSE^2 + H34 * MSPO * MSE
-      po.lower <- pmax(0, s2_po - sqrt(v_lpo) / r)
-      po.upper <- s2_po + sqrt(v_upo) / r
-      paste("lower:", po.lower, " upper:", po.upper)
-    }else if(input$conf =="s2_tot"){
-      v_lt <- G1^2 * p^2 * MSP^2 +
-        G2^2 * o^2 * MSO^2 +
-        G3^2 * (p * o - p - o)^2 * MSPO^2 +
-        G4^2 * (p * o)^2 * (r - 1)^2 * MSE^2
-      v_ut <- H1^2 * p^2 * MSP^2 +
-        H2^2 * o^2 * MSO^2 +
-        H3^2 * (p * o - p - o)^2 * MSPO^2 +
-        H4^2 * (p * o)^2 * (r - 1)^2 * MSE^2
-      total.lower <- pmax(0, s2_tot - sqrt(v_lt) / (p * o * r))
-      total.upper <- s2_tot + sqrt(v_ut) / (p * o * r)
-      paste("lower:", total.lower, " upper:", total.upper)
-    }else if(input$conf =="s2_repro"){
-      v_lrepro <- (G2^2 * MSO^2 +
-                     G3^2 * (p - 1)^2 * MSPO^2 +
-                     H4^2 * p^2 * MSE^2 +
-                     G24 * p * MSO * MSE +
-                     G34 * (p - 1) * p * MSPO * MSE +
-                     G23.star * (p - 1) * MSO * MSPO) / (p * r)^2
-      v_urepo <- (H2^2 * MSO^2 +
-                    H3^2 * (p - 1)^2 * MSPO^2 +
-                    G4^2 * p^2 * MSE^2 +
-                    H24 * p * MSO * MSE +
-                    H34 * (p - 1) * p * MSPO * MSE) / (p * r)^2
-      repro.lower <- pmax(0, s2_repro - sqrt(v_lrepro))
-      repro.upper <- s2_repro + sqrt(v_urepo)
-      paste("lower:", repro.lower, " upper:", repro.upper)
-    }else if(input$conf =="s2_gauge"){
-      v_lm <- G2^2 * MSO^2 + G3^2 * (p - 1)^2 * MSPO^2 + G4^2 * p^2 * (r - 1)^2 * MSE^2
-      v_um <- H2^2 * MSO^2 + H3^2 * (p - 1)^2 * MSPO^2 + H4^2 * p^2 * (r - 1)^2 * MSE^2
-      gauge.lower <- pmax(0, s2_gauge - sqrt(v_lm) / (p * r))
-      gauge.upper <- s2_gauge + sqrt(v_um) / (p * r)
-      paste("lower:", gauge.lower, " upper:", gauge.upper)
-    }else if(input$conf =="pg_ratio"){
-      pg_ratio_lower <- pmax(0, (p * (1 - G1) * (MSP - F1 * MSPO)) /
-        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO))
-      pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
-        (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
-      paste("lower:", pg_ratio_lower, " upper:", pg_ratio_upper)
-    }else if(input$conf =="tg_ratio"){
-      pg_ratio_lower <- pmax(0, (p * (1 - G1) * (MSP - F1 * MSPO)) /
-        (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO))
-      pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
-        (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
-      tg_ratio_lower <- 1 + pg_ratio_lower
-      tg_ratio_upper <- 1 + pg_ratio_upper
-      paste("lower:", tg_ratio_lower, " upper:", tg_ratio_upper)
-    }else if(input$conf =="pr_ratio"){MSPO
-      pr_ratio_lower <- pmax(0, (MSPO / (o * r * MSE * F9)) *
-        ((MSP / MSPO) - (1 / (1 - G1)) + (MSPO * F1 * (1 - F1 * (1 - G1))) / (MSP * (1 - G1))))
-      pr_ratio_upper <- (MSPO / (o * r * MSE * F10)) *
-        ((MSP / MSPO) - (1 / (1 + H1)) + (MSPO * F2 * (1 - F2 * (1 + H1))) / (MSP * (1 + H1)))
-      paste("lower:", pr_ratio_lower, " upper:", pr_ratio_upper)
-    }
+    repeat.lower <- pmax(0,(1 - G4) * MSE)
+    repeat.upper <- (1 + H4) * MSE
+
+    v_lp <- G1^2 * MSP^2 + H3^2 * MSPO^2 + G13 * MSP * MSPO
+    v_up <- H1^2 * MSP^2 + G3^2 * MSPO^2 + H13 * MSP * MSPO
+    parts.lower <- pmax(0, s2_p - sqrt(v_lp) / (o * r))
+    parts.upper <- s2_p + sqrt(v_up) / (o * r)
+
+    v_lo <- G2^2 * MSO^2 + H3^2 * MSPO^2 + G23 * MSO * MSPO
+    v_uo <- H2^2 * MSO^2 + G3^2 * MSPO^2 + H23 * MSO * MSPO
+    oper.lower <- pmax(0, s2_o - sqrt(v_lo) / (p * r))
+    oper.upper <- s2_o + sqrt(v_uo) / (p * r)
+
+    v_lpo <- G3^2 * MSPO^2 + H4^2 * MSE^2 + G34 * MSPO * MSE
+    v_upo <- H3^2 * MSPO^2 + G4^2 * MSE^2 + H34 * MSPO * MSE
+    po.lower <- pmax(0, s2_po - sqrt(v_lpo) / r)
+    po.upper <- s2_po + sqrt(v_upo) / r
+
+    v_lt <- G1^2 * p^2 * MSP^2 +
+      G2^2 * o^2 * MSO^2 +
+      G3^2 * (p * o - p - o)^2 * MSPO^2 +
+      G4^2 * (p * o)^2 * (r - 1)^2 * MSE^2
+    v_ut <- H1^2 * p^2 * MSP^2 +
+      H2^2 * o^2 * MSO^2 +
+      H3^2 * (p * o - p - o)^2 * MSPO^2 +
+      H4^2 * (p * o)^2 * (r - 1)^2 * MSE^2
+    total.lower <- pmax(0, s2_tot - sqrt(v_lt) / (p * o * r))
+    total.upper <- s2_tot + sqrt(v_ut) / (p * o * r)
+
+    v_lrepro <- (G2^2 * MSO^2 +
+                    G3^2 * (p - 1)^2 * MSPO^2 +
+                    H4^2 * p^2 * MSE^2 +
+                    G24 * p * MSO * MSE +
+                    G34 * (p - 1) * p * MSPO * MSE +
+                    G23.star * (p - 1) * MSO * MSPO) / (p * r)^2
+    v_urepo <- (H2^2 * MSO^2 +
+                  H3^2 * (p - 1)^2 * MSPO^2 +
+                  G4^2 * p^2 * MSE^2 +
+                  H24 * p * MSO * MSE +
+                  H34 * (p - 1) * p * MSPO * MSE) / (p * r)^2
+    repro.lower <- pmax(0, s2_repro - sqrt(v_lrepro))
+    repro.upper <- s2_repro + sqrt(v_urepo)
+
+    v_lm <- G2^2 * MSO^2 + G3^2 * (p - 1)^2 * MSPO^2 + G4^2 * p^2 * (r - 1)^2 * MSE^2
+    v_um <- H2^2 * MSO^2 + H3^2 * (p - 1)^2 * MSPO^2 + H4^2 * p^2 * (r - 1)^2 * MSE^2
+    gauge.lower <- pmax(0, s2_gauge - sqrt(v_lm) / (p * r))
+    gauge.upper <- s2_gauge + sqrt(v_um) / (p * r)
+
+    pg_ratio_lower <- pmax(0, (p * (1 - G1) * (MSP - F1 * MSPO)) /
+      (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO))
+    pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
+      (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
+
+    pg_ratio_lower <- pmax(0, (p * (1 - G1) * (MSP - F1 * MSPO)) /
+      (p * o * (r - 1) * MSE + o * (1 - G1) * F3 * MSO + o * (p - 1) * MSPO))
+    pg_ratio_upper <- (p * (1 + H1) * (MSP - F2 * MSPO)) /
+      (p * o * (r - 1) * MSE + o * (1 + H1) * F4 * MSO + o * (p - 1) * MSPO)
+    tg_ratio_lower <- 1 + pg_ratio_lower
+    tg_ratio_upper <- 1 + pg_ratio_upper
+
+    pr_ratio_lower <- pmax(0, (MSPO / (o * r * MSE * F9)) *
+      ((MSP / MSPO) - (1 / (1 - G1)) + (MSPO * F1 * (1 - F1 * (1 - G1))) / (MSP * (1 - G1))))
+    pr_ratio_upper <- (MSPO / (o * r * MSE * F10)) *
+      ((MSP / MSPO) - (1 / (1 + H1)) + (MSPO * F2 * (1 - F2 * (1 + H1))) / (MSP * (1 + H1)))
+
+    quantity <- c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
+                  "s2_repro", "s2_gauge", "pg_ratio","tg_ratio", "pr_ratio")
+    estimate <- c(MSE, s2_p, s2_o, s2_po, s2_tot,  s2_repro, s2_gauge,
+                  pg_ratio, gt_ratio, pr_ratio)
+    lower <- c(repeat.lower, parts.lower, oper.lower, po.lower, total.lower,
+               repro.lower, gauge.lower, pg_ratio_lower, tg_ratio_lower, pr_ratio_lower)
+    upper <- c(repeat.upper, parts.upper, oper.upper, po.upper, total.upper,
+               repro.upper, gauge.upper,pg_ratio_upper, tg_ratio_upper, pr_ratio_upper)
+    upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
+                                                       names_to = "estimate", values_to = "upper")%>%
+      select(2)
+    lower.bounds <- data.frame(quantity, lower)
+    estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
+                                                            names_to = "measure", values_to = "estimate")%>%
+      select(2)
+    return(cbind(lower.bounds, upper.bounds, estimate.value))
     }
     else if(input$type == "gpq"){
       N <- 1e5

@@ -22,7 +22,10 @@ ui <- navbarPage(title = "Shiny Gague R&R",
                        mainPanel(
                         textOutput(
                           outputId = "dataSelect"
-                        ) # end textOutput
+                        ), # end textOutput
+                        tableOutput(
+                          outputId = "dataT"
+                        )
                        )# end mainPanel
                      ) # end sidebarLayout
                    ) # end fluidPage
@@ -73,20 +76,13 @@ ui <- navbarPage(title = "Shiny Gague R&R",
                      sidebarLayout(
                        sidebarPanel(
                          radioButtons(
-                           inputId = "conf",
-                           label = "choose the type of estimator you want calculated",
-                           choices = c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
-                                       "s2_repro", "s2_gauge", "pg_ratio","gt_ratio",
-                                       "pr_ratio")
-                         ), #end radioButtons
-                         radioButtons(
                            inputId = "type",
                            label = "choose the type of estimator you want calculated",
                            choices = c("mls", "gpq")
                          ), #end radioButtons
                          sliderInput(
                            inputId = "alpha",
-                           label = "chose a value for alpha",
+                           label = "chose a confidence level",
                            min = 0,
                            max = 1,
                            value = 0.90,
@@ -148,11 +144,11 @@ ui <- navbarPage(title = "Shiny Gague R&R",
 server <- function(input, output){
   data_frame <- reactive({
     if(input$data == "kf_rr.csv"){
-      data_frame <-  as.data.frame(read_delim("kf_rr.csv", delim="\t"))
+      data_frame <- read_delim("kf_rr.csv", delim="\t")
     } # end if statement
     else if (input$data == "long_houf_berman.csv"){
       data_frame <- read_csv("long_houf_berman.csv") %>%
-        rename(P=Part, O = Operator, Y=y)
+        rename(P=Part, O=Operator, Y=y)
     }# end else if statement
   }) # end data_frame
 
@@ -222,14 +218,67 @@ server <- function(input, output){
                 summarize(ybar = mean(Y)))
     r <- n/(o*p)
 
-    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSE <- data_frame()%>%
+        group_by(O, P) %>%
+        mutate(ybar2 = mean(Y)) %>%
+        summarize(SSe = sum((ybar2-Y)^2)) %>%
+        ungroup()%>%
+        summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
+
+    MSP <- data_frame() %>%
+        group_by(P) %>%
+        mutate(ybarI = mean(Y)) %>%
+        ungroup() %>%
+        mutate(ybar = mean(Y)) %>%
+        summarize(ssP1 = (ybarI-ybar)^2) %>%
+        distinct() %>%
+        summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
+
+    MSO <- data_frame() %>%
+        group_by(O) %>%
+        mutate(ybarJ = mean(Y)) %>%
+        ungroup() %>%
+        mutate(ybar = mean(Y)) %>%
+        summarize(ssP1 = (ybarJ-ybar)^2) %>%
+        distinct() %>%
+        summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
+
+    SSP <- data_frame() %>%
+        group_by(P)%>%
+        mutate(ybarI = mean(Y)) %>%
+        ungroup() %>%
+        mutate(ybar = mean(Y)) %>%
+        summarize(ssP1 = (ybarI-ybar)^2) %>%
+        distinct() %>%
+        summarize(SSP = sum(ssP1)* r * o) #end SSP
+
+    SSO <- data_frame() %>%
+        group_by(O) %>%
+        mutate(ybarJ = mean(Y)) %>%
+        ungroup() %>%
+        mutate(ybar = mean(Y)) %>%
+        summarize(ssP1 = (ybarJ-ybar)^2) %>%
+        distinct() %>%
+        summarize(SSO = sum(ssP1)* r * p) #end SSO
+    SSE <- data_frame()%>%
+        group_by(O, P) %>%
+        mutate(ybar2 = mean(Y)) %>%
+        summarize(SSe = sum((ybar2-Y)^2)) %>%
+        ungroup()%>%
+        summarize(SSE=sum(SSe)) # end SSE
+
+    SST<- data_frame()%>%
+        summarize(var = var(Y))%>%
+        summarize(MSPO = var*(n-1)) # end SST
+
+    SSPO <- SST-sum(SSP, SSO, SSE)
 
     if (input$meanSums == "MSP"){
-      return(MSP())
+      return(MSP)
     }else if(input$meanSums == "MSO"){
-      return(MSO())
+      return(MSO)
     }else if(input$meanSums == "MSE"){
-      return(MSE())
+      return(MSE)
     }else if(input$meanSums == "MSPO"){
       MSPO <- SSPO/((p-1)*(o-1))
       return(MSPO)
@@ -245,11 +294,60 @@ server <- function(input, output){
                 group_by(O) %>%
                 summarize(ybar = mean(Y)))
     r <- n/(o*p)
-    MSE <- MSE()
-    MSP <- MSP()
-    MSO <- MSO()
+    MSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
 
-    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSP <- data_frame() %>%
+      group_by(P) %>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
+
+    MSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
+
+    SSP <- data_frame() %>%
+      group_by(P)%>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSP = sum(ssP1)* r * o) #end SSP
+
+    SSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSO = sum(ssP1)* r * p) #end SSO
+    SSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(SSE=sum(SSe)) # end SSE
+
+    SST<- data_frame()%>%
+      summarize(var = var(Y))%>%
+      summarize(MSPO = var*(n-1)) # end SST
+
+    SSPO <- SST-sum(SSP, SSO, SSE)
     MSPO <- SSPO/((p-1)*(o-1))
 
     s2_p <-(MSP-MSPO)/(o*r)
@@ -268,20 +366,20 @@ server <- function(input, output){
     }else if (input$est == "s2_po"){
       paste(pmax(0,s2_po))
     }else if (input$est == "s2_tot"){
-      paste(pmax(0,s2_tot))
+      paste(s2_tot)
     }else if (input$est == "s2_repro"){
       paste(pmax(0,s2_repro))
     }else if(input$est == "s2_gauge"){
-      paste(pmax(0,s2_gauge))
+      paste(s2_gauge)
     }else if(input$est == "pg_ratio"){
       pg_ratio <- s2_p / s2_gauge
-      paste(pmax(0,pg_ratio))
+      paste(pg_ratio)
     }else if(input$est == "gt_ratio"){
       gt_ratio <- s2_gauge/s2_tot
-      paste(pmax(0,gt_ratio))
+      paste(gt_ratio)
     }else if(input$est == "pr_ratio"){
       pr_ratio <- s2_p/MSE
-      paste(pmax(0,pr_ratio))
+      paste(pr_ratio)
     }
   })
   output$tableConf <- renderTable({
@@ -293,11 +391,60 @@ server <- function(input, output){
                 group_by(O) %>%
                 summarize(ybar = mean(Y)))
     r <- n/(o*p)
-    MSE <- MSE()
-    MSP <- MSP()
-    MSO <- MSO()
+    MSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
 
-    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSP <- data_frame() %>%
+      group_by(P) %>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
+
+    MSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
+
+    SSP <- data_frame() %>%
+      group_by(P)%>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSP = sum(ssP1)* r * o) #end SSP
+
+    SSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSO = sum(ssP1)* r * p) #end SSO
+    SSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(SSE=sum(SSe)) # end SSE
+
+    SST<- data_frame()%>%
+      summarize(var = var(Y))%>%
+      summarize(MSPO = var*(n-1)) # end SST
+
+    SSPO <- SST-sum(SSP, SSO, SSE)
     MSPO <- SSPO/((p-1)*(o-1))
 
     s2_p <-pmax(0,(MSP-MSPO)/(o*r))
@@ -457,66 +604,45 @@ server <- function(input, output){
         ((p - 1)^2 * (o - 1) * MSPO) / (p * r * W3) +
         (p * o * (r - 1)^2 * MSE) / (r * W4)
 
+      G4 <- 1-qf(alpha/2, Inf, p*o*(r-1))
+      H4 <- qf(1-alpha/2, Inf, p*o*(r-1))-1
+
+      repeat.lower <- (1-G4)*MSE
+      repeat.upper <- (1+H4)*MSE
+
       gpq_repeat <- (p * o * (r - 1) * MSE) / W4
+
+      gpq_part_gauge <- gpq_part / gpq_gauge
+      gpq_gauge_total <- gpq_gauge / gpq_total
+      gpq_part_repeat <- gpq_part / gpq_repeat
 
       probs <- c(alpha/2, 1 - alpha/2)
 
-      if(input$conf == "s2_repeat"){
-        bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
-        lower <- MSE - bounds[1]
-        upper <- MSE + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "s2_p"){
-        bounds <- quantile(gpq_part, probs, na.rm = TRUE)
-        lower <- s2_p - bounds[1]
-        upper <- s2_p + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "s2_o"){
-        bounds <- quantile(gpq_oper, probs, na.rm = TRUE)
-        lower <- s2_o - bounds[1]
-        upper <- s2_o + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "s2_po"){
-        bounds <- quantile(gpq_po, probs, na.rm = TRUE)
-        lower <- s2_po - bounds[1]
-        upper <- s2_po + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "s2_tot"){
-        bounds <- quantile(gpq_repeat, probs, na.rm = TRUE)
-        paste(bounds)
-        lower <- s2_tot - bounds[1]
-        upper <- s2_tot + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "s2_repro"){
-        bounds <- quantile(gpq_repro, probs, na.rm = TRUE)
-        lower <- s2_repro - bounds[1]
-        upper <- s2_repro + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "s2_gauge"){
-        bounds <- quantile(gpq_gauge, probs, na.rm = TRUE)
-        quantile(gpq_gauge, probs, na.rm = TRUE)
-        lower <- s2_gauge - bounds[1]
-        upper <- s2_gauge + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "pg_ratio"){
-        gpq_part_gauge <- gpq_part / gpq_gauge
-        bounds <- quantile(gpq_part_gauge, probs, na.rm = TRUE)
-        lower <- pg_ratio - bounds[1]
-        upper <- pg_ratio + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "tg_ratio"){
-        gpq_gauge_total <- gpq_gauge / gpq_total
-        bounds <- quantile(gpq_gauge_total, probs, na.rm = TRUE)
-        lower <- gt_ratio - bounds[1]
-        upper <- gt_ratio + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }else if(input$conf == "pr_ratio"){
-        gpq_part_repeat <- gpq_part / gpq_repeat
-        bounds <- quantile(gpq_part_repeat, probs, na.rm = TRUE)
-        lower <- pr_ratio - bounds[1]
-        upper <- pr_ratio + bounds[2]
-        paste("lower:", lower, " upper:", upper)
-      }
+      quantity <- c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
+                    "s2_repro", "s2_gauge", "pg_ratio","gt_ratio", "pr_ratio")
+      estimate <- c(MSE, s2_p, s2_o, s2_po, s2_tot,  s2_repro, s2_gauge,
+                    pg_ratio, gt_ratio, pr_ratio)
+      estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
+                                                         names_to = "name", values_to = "estimate")%>%
+        select(2)
+      est.quant <- data.frame(quantity, estimators)
+
+      limits <- bind_rows(quantile(gpq_repeat, probs, na.rm = TRUE),
+                          quantile(gpq_part, probs, na.rm = TRUE),
+                          quantile(gpq_oper, probs, na.rm = TRUE),
+                          quantile(gpq_po, probs, na.rm = TRUE),
+                          quantile(gpq_repeat, probs, na.rm = TRUE),
+                          quantile(gpq_repro, probs, na.rm = TRUE),
+                          quantile(gpq_gauge, probs, na.rm = TRUE),
+                          quantile(gpq_part_gauge, probs, na.rm = TRUE),
+                          quantile(gpq_gauge_total, probs, na.rm = TRUE),
+                          quantile(gpq_part_repeat, probs, na.rm = TRUE)
+      )
+      #colnames(limits) <- c("lower", "upper")
+
+
+      GPQ <- bind_cols(est.quant, limits)
+      return(GPQ)
     }
   })
   output$tableF <- renderTable({
@@ -528,16 +654,69 @@ server <- function(input, output){
                 group_by(O) %>%
                 summarize(ybar = mean(Y)))
     r <- n/(o*p)
-    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
+
+    MSP <- data_frame() %>%
+      group_by(P) %>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
+
+    MSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
+
+    SSP <- data_frame() %>%
+      group_by(P)%>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSP = sum(ssP1)* r * o) #end SSP
+
+    SSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSO = sum(ssP1)* r * p) #end SSO
+    SSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(SSE=sum(SSe)) # end SSE
+
+    SST<- data_frame()%>%
+      summarize(var = var(Y))%>%
+      summarize(MSPO = var*(n-1)) # end SST
+
+    SSPO <- SST-sum(SSP, SSO, SSE)
     MSPO <- SSPO/((p-1)*(o-1))
     if(input$fVal == "part"){
-      f <- MSO()/MSPO
+      f <- MSO/MSPO
       paste(f)
     }else if(input$fVal == "operator"){
-      f <- MSP()/MSPO
+      f <- MSP/MSPO
       paste(f)
     }else if(input$fVal == "operator by part"){
-      f <- MSPO/MSE()
+      f <- MSPO/MSE
       paste(f)
     }
   })
@@ -550,30 +729,83 @@ server <- function(input, output){
                 group_by(O) %>%
                 summarize(ybar = mean(Y)))
     r <- n/(o*p)
-    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
+
+    MSP <- data_frame() %>%
+      group_by(P) %>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
+
+    MSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
+
+    SSP <- data_frame() %>%
+      group_by(P)%>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSP = sum(ssP1)* r * o) #end SSP
+
+    SSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSO = sum(ssP1)* r * p) #end SSO
+    SSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(SSE=sum(SSe)) # end SSE
+
+    SST<- data_frame()%>%
+      summarize(var = var(Y))%>%
+      summarize(MSPO = var*(n-1)) # end SST
+
+    SSPO <- SST-sum(SSP, SSO, SSE)
     MSPO <- SSPO/((p-1)*(o-1))
     # choices = c("repeatability", "operators*parts",
     #"parts","opertors")
     if (input$var == "repeatability"){
-      var <- MSE()
+      var <- MSE
       paste(pmax(0,var))
     }else if (input$var == "operators*parts"){
-      var <- MSPO - MSE()
+      var <- MSPO - MSE
       paste(pmax(0,var))
     }else if (input$var == "parts"){
-      var <- (MSP()- MSPO)/(o *r)
+      var <- (MSP- MSPO)/(o *r)
       paste(pmax(0,var))
     }else if (input$var == "opertors"){
-      var <- MSO()-MSPO/(p*r)
+      var <- MSO-MSPO/(p*r)
       paste(pmax(0,var))
     }else if (input$var == "R&R"){
-      var <- MSE() + (MSO()-MSPO/(p*r))
+      var <- MSE + (MSO-MSPO/(p*r))
       paste(pmax(0,var))
     } else if (input$var == "total"){
-      var <- pmax(0,MSE()) +
-        pmax(0,((MSP()- MSPO)/(o *r))) +
-        pmax(0,(MSO()-MSPO/(p*r))) +
-        pmax(0, MSPO - MSE())
+      var <- pmax(0,MSE) +
+        pmax(0,((MSP- MSPO)/(o *r))) +
+        pmax(0,(MSO-MSPO/(p*r))) +
+        pmax(0, MSPO - MSE)
       paste(var)
     }
   })
@@ -586,30 +818,86 @@ server <- function(input, output){
                 group_by(O) %>%
                 summarize(ybar = mean(Y)))
     r <- n/(o*p)
-    SSPO <- SST()-sum(SSP(), SSO(), SSE())
+    MSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
+
+    MSP <- data_frame() %>%
+      group_by(P) %>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
+
+    MSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
+
+    SSP <- data_frame() %>%
+      group_by(P)%>%
+      mutate(ybarI = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarI-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSP = sum(ssP1)* r * o) #end SSP
+
+    SSO <- data_frame() %>%
+      group_by(O) %>%
+      mutate(ybarJ = mean(Y)) %>%
+      ungroup() %>%
+      mutate(ybar = mean(Y)) %>%
+      summarize(ssP1 = (ybarJ-ybar)^2) %>%
+      distinct() %>%
+      summarize(SSO = sum(ssP1)* r * p) #end SSO
+    SSE <- data_frame()%>%
+      group_by(O, P) %>%
+      mutate(ybar2 = mean(Y)) %>%
+      summarize(SSe = sum((ybar2-Y)^2)) %>%
+      ungroup()%>%
+      summarize(SSE=sum(SSe)) # end SSE
+
+    SST<- data_frame()%>%
+      summarize(var = var(Y))%>%
+      summarize(MSPO = var*(n-1)) # end SST
+
+    SSPO <- SST-sum(SSP, SSO, SSE)
     MSPO <- SSPO/((p-1)*(o-1))
-    total<- (pmax(0,MSE()) +
-      pmax(0,((MSP()- MSPO)/(o *r))) +
-      pmax(0,(MSO()-MSPO/(p*r))) +
-      pmax(0, MSPO - MSE()))
+    total<- (pmax(0,MSE) +
+      pmax(0,((MSP- MSPO)/(o *r))) +
+      pmax(0,(MSO-MSPO/(p*r))) +
+      pmax(0, MSPO - MSE))
     if (input$var == "repeatability"){
-      per <- MSE()
+      per <- MSE
       paste((pmax(0,per)/total)*100)
     }else if (input$var == "operators*parts"){
-      per <- (MSPO - MSE())
+      per <- (MSPO - MSE)
       paste((pmax(0,per)/total)*100)
     }else if (input$var == "parts"){
-      per <- ((MSP()- MSPO)/(o *r))
+      per <- ((MSP- MSPO)/(o *r))
       paste((pmax(0,per)/total)*100)
     }else if (input$var == "opertors"){
-      per <- (MSO()-MSPO/(p*r))
+      per <- (MSO-MSPO/(p*r))
       paste((pmax(0,per)/total)*100)
     }else if (input$var == "R&R"){
-      per <- (MSE() + (MSO()-MSPO/(p*r)))
+      per <- (MSE + (MSO-MSPO/(p*r)))
       paste((pmax(0,per)/total)*100)
     }else if (input$var == "total"){
       paste(100)
     }
+  })
+  output$dataT <- renderTable({
+    return(data_frame())
   })
 }
 

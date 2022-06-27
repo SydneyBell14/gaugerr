@@ -638,10 +638,12 @@ server <- function(input, output){
                           quantile(gpq_gauge_total, probs, na.rm = TRUE),
                           quantile(gpq_part_repeat, probs, na.rm = TRUE)
       )
-      #colnames(limits) <- c("lower", "upper")
 
+      colnames(limits) <- c("lower", "upper")
 
-      GPQ <- bind_cols(est.quant, limits)
+      GPQ <- est.quant %>%
+        mutate(lower = pmax(0,estimate - limits$lower))%>%
+        mutate(upper = estimate + limits$upper)
       return(GPQ)
     }
   })

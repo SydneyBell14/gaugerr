@@ -9,12 +9,5 @@ data_renaming <- function(data, part=P, operator=O, measurement=Y){
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
 
-  #data %>% mutate(
-    #P = data${part},
-    #O = data${operator},
-    #Y = data${measurement}
-  )
-
-
   return(c(n,r,o,p))
 }

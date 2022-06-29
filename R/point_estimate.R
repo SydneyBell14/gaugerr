@@ -27,6 +27,8 @@
 #' point_estimate(mydata)
 #' point_estimate(mydata, part=P, operator=O, measurement=Y)
 point_estimate <- function(data, part=P, operator=O, measurement=Y) {
+
+  # calculations of n,p,r and o
   n <- nrow(data)
   p <- nrow(data %>%
               group_by({{part}}) %>%
@@ -35,31 +37,9 @@ point_estimate <- function(data, part=P, operator=O, measurement=Y) {
               group_by({{operator}}) %>%
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
-  MSE <- data%>%
-    group_by({{operator}}, {{part}}) %>%
-    mutate(ybar2 = mean({{measurement}})) %>%
-    summarize(SSe = sum((ybar2-{{measurement}})^2)) %>%
-    ungroup()%>%
-    summarize(MSE=sum(SSe)/(p*o*(r-1))) #end MSE
 
-  MSP <- data %>%
-    group_by({{part}}) %>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (ybarI-ybar)^2) %>%
-    distinct() %>%
-    summarize(MSP = (sum(ssP1)* r * o)/(p-1)) #end MSP
 
-  MSO <- data %>%
-    group_by({{operator}}) %>%
-    mutate(ybarJ = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (ybarJ-ybar)^2) %>%
-    distinct() %>%
-    summarize(MSO = (sum(ssP1)* r * p)/(o-1)) #end MSO
-
+  #SSP: sum of squares for parts
   SSP <- data %>%
     group_by({{part}})%>%
     mutate(ybarI = mean({{measurement}})) %>%
@@ -67,8 +47,8 @@ point_estimate <- function(data, part=P, operator=O, measurement=Y) {
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = (ybarI-ybar)^2) %>%
     distinct() %>%
-    summarize(SSP = sum(ssP1)* r * o) #end SSP
-
+    summarize(SSP = sum(ssP1)* r * o)
+  #SSO: sum of squares for operator
   SSO <- data %>%
     group_by({{operator}}) %>%
     mutate(ybarJ = mean({{measurement}})) %>%
@@ -76,21 +56,28 @@ point_estimate <- function(data, part=P, operator=O, measurement=Y) {
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = (ybarJ-ybar)^2) %>%
     distinct() %>%
-    summarize(SSO = sum(ssP1)* r * p) #end SSO
+    summarize(SSO = sum(ssP1)* r * p)
+  #SSE: sum of squares for equipment (part/operator interaction)
   SSE <- data%>%
     group_by({{operator}}, {{part}}) %>%
     mutate(ybar2 = mean({{measurement}})) %>%
     summarize(SSe = sum((ybar2-{{measurement}})^2)) %>%
     ungroup()%>%
     summarize(SSE=sum(SSe)) # end SSE
-
+  #SST: the total variance for sum of squares
   SST<- data%>%
     summarize(var = var({{measurement}}))%>%
     summarize(MSPO = var*(n-1)) # end SST
-
+  #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
+
+  #calculations for MSP, MSO, MSE and MSPO
+  MSP <- SSP/(p - 1)
+  MSO <- SSO/(o - 1)
+  MSE <- SSE/(p * o * (r - 1))
   MSPO <- SSPO/((p-1)*(o-1))
 
+  # point estimate calculations
   s2_p <-pmax(0,(MSP-MSPO)/(o*r))
   s2_o <- pmax(0,(MSO-MSPO)/(p*r))
   s2_po <- pmax(0,(MSPO-MSE)/r)
@@ -101,5 +88,6 @@ point_estimate <- function(data, part=P, operator=O, measurement=Y) {
   gt_ratio <- s2_gauge/s2_tot
   pr_ratio <- s2_p/MSE
 
+  #return statement will output the point estimate values
   return(c(s2_p, s2_o, s2_po, s2_tot, s2_repro, s2_gauge, pg_ratio, gt_ratio, pr_ratio))
 }

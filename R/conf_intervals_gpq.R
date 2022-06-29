@@ -1,0 +1,131 @@
+conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05, N=1e5) {
+  #calculations for n, p, o, r based on the data frame
+  n <- nrow(data)
+  p <- nrow(data %>%
+              group_by({{part}}) %>%
+              summarize(ybar = mean({{measurement}})))
+  o <- nrow(data %>%
+              group_by({{operator}}) %>%
+              summarize(ybar = mean({{measurement}})))
+  r <- n/(o*p)
+
+  #SSP: sum of squares for parts
+  SSP <- data %>%
+    group_by({{part}})%>%
+    mutate(ybarI = mean({{measurement}})) %>%
+    ungroup() %>%
+    mutate(ybar = mean({{measurement}})) %>%
+    summarize(ssP1 = (ybarI-ybar)^2) %>%
+    distinct() %>%
+    summarize(SSP = sum(ssP1)* r * o)
+  #SSO: sum of squares for operator
+  SSO <- data %>%
+    group_by({{operator}}) %>%
+    mutate(ybarJ = mean({{measurement}})) %>%
+    ungroup() %>%
+    mutate(ybar = mean({{measurement}})) %>%
+    summarize(ssP1 = (ybarJ-ybar)^2) %>%
+    distinct() %>%
+    summarize(SSO = sum(ssP1)* r * p)
+  #SSE: sum of squares for equipment (part/operator interaction)
+  SSE <- data%>%
+    group_by({{operator}}, {{part}}) %>%
+    mutate(ybar2 = mean({{measurement}})) %>%
+    summarize(SSe = sum((ybar2-{{measurement}})^2)) %>%
+    ungroup()%>%
+    summarize(SSE=sum(SSe)) # end SSE
+  #SST: the total variance for sum of squares
+  SST<- data%>%
+    summarize(var = var({{measurement}}))%>%
+    summarize(MSPO = var*(n-1)) # end SST
+  #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
+  SSPO <- SST-sum(SSP, SSO, SSE)
+
+  #calculations for MSP, MSO, MSE and MSPO
+  MSP <- SSP/(p - 1)
+  MSO <- SSO/(o - 1)
+  MSE <- SSE/(p * o * (r - 1))
+  MSPO <- SSPO/((p-1)*(o-1))
+
+  #calculations for the point estimate values
+  s2_p <-pmax(0,(MSP-MSPO)/(o*r))
+  s2_o <- pmax(0,(MSO-MSPO)/(p*r))
+  s2_po <- pmax(0,(MSPO-MSE)/r)
+  s2_tot <- pmax(0,(p*MSP+o*MSO+(p*o-p-o)*MSPO+p*o*(r-1)*MSE)/(p*o*r))
+  s2_repro <- pmax(0,(MSO+(p-1)*MSPO-p*MSE)/(p*r))
+  s2_gauge <- pmax(0,(MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r))
+  pg_ratio <- pmax(0,s2_p / s2_gauge)
+  gt_ratio <- pmax(0,s2_gauge/s2_tot)
+  pr_ratio <- pmax(0,s2_p/MSE)
+
+  # coefficients based on N the number of simulations
+  W1 <- rchisq(N, p - 1)
+  W2 <- rchisq(N, o - 1)
+  W3 <- rchisq(N, (o - 1) * (p - 1))
+  W4 <- rchisq(N, p * o * (r - 1))
+
+  # the estimators for the gpq calculations
+  gpq_part  <- pmax(0, ((p - 1) * MSP) / (o * r * W1) -
+                      ((p - 1) * (o - 1) * MSPO) / (o * r * W3))
+
+  gpq_oper <- pmax(0, ((o - 1) * MSO) / (p * r * W2) -
+                     ((p - 1) * (o - 1) * MSPO) / (p * r * W3))
+
+  gpq_po <- pmax(0, ((p - 1) * (o - 1) * MSPO) / (r * W3) -
+                   (p * o * (r - 1) * MSE) / (r * W4))
+
+  gpq_total <- ((p - 1) * MSP) / (o * r * W1) + ((o - 1) * MSO) / (p * r * W2) +
+    (((p * o - p - o) * (p - 1) * (o - 1)) * MSPO) / (p * o * r * W3) +
+    (p * o * (r - 1)^2 * MSE) / (r * W4)
+
+  gpq_repro <- pmax(0,
+                    ((o - 1) * MSO) / (p * r * W2) +
+                      (1 / r) * (1 - 1/ p) * ((p - 1) * ((o - 1) * MSPO) / W3) -
+                      (p * o * (r - 1) * MSE) / (r * W4) )
+
+  gpq_gauge <- ((o - 1) * MSO) / (p * r * W2) +
+    ((p - 1)^2 * (o - 1) * MSPO) / (p * r * W3) +
+    (p * o * (r - 1)^2 * MSE) / (r * W4)
+
+  #coefficients for the repeat upper and lower bounds
+  G4 <- 1-qf(alpha/2, Inf, p*o*(r-1))
+  H4 <- qf(1-alpha/2, Inf, p*o*(r-1))-1
+  repeat.lower <- (1-G4)*MSE
+  repeat.upper <- (1+H4)*MSE
+
+  gpq_repeat <- (p * o * (r - 1) * MSE) / W4
+
+  gpq_part_gauge <- gpq_part / gpq_gauge
+  gpq_gauge_total <- gpq_gauge / gpq_total
+  gpq_part_repeat <- gpq_part / gpq_repeat
+
+  # assigning the confidence levels based on the alpha value
+  probs <- c(alpha/2, 1 - alpha/2)
+
+  # defining the columns for the data frame of values.
+  quantity <- c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
+                "s2_repro", "s2_gauge", "pg_ratio","gt_ratio", "pr_ratio")
+  estimate <- c(MSE, s2_p, s2_o, s2_po, s2_tot,  s2_repro, s2_gauge,
+                pg_ratio, gt_ratio, pr_ratio)
+  estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
+                names_to = "name", values_to = "estimate") %>% select(2)
+  est.quant <- data.frame(quantity, estimators)
+  limits <- bind_rows(quantile(gpq_repeat, probs, na.rm = TRUE),
+                      quantile(gpq_part, probs, na.rm = TRUE),
+                      quantile(gpq_oper, probs, na.rm = TRUE),
+                      quantile(gpq_po, probs, na.rm = TRUE),
+                      quantile(gpq_repeat, probs, na.rm = TRUE),
+                      quantile(gpq_repro, probs, na.rm = TRUE),
+                      quantile(gpq_gauge, probs, na.rm = TRUE),
+                      quantile(gpq_part_gauge, probs, na.rm = TRUE),
+                      quantile(gpq_gauge_total, probs, na.rm = TRUE),
+                      quantile(gpq_part_repeat, probs, na.rm = TRUE)
+  )
+  colnames(limits) <- c("lower", "upper")
+
+  # building the data frame for the estimate, upper and lower limits of the CI
+  GPQ <- est.quant %>%
+    mutate(lower = pmax(0,estimate - limits$lower))%>%
+    mutate(upper = estimate + limits$upper)
+  return(GPQ)
+}

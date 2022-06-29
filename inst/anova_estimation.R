@@ -108,7 +108,7 @@ rr_anova_estimates(data1)
 # Using estimates and CIs from Burdick, Borror & Montgomery
 # See chapter 3 for balanced two-way designs
 rr_anova_cis <- function(data, level = 0.95, ci.type = "mls", N = 1e5){
-  ms <- balanced_mean_squares(data1)
+  ms <- balanced_mean_squares(data2)
 
   mse  <- ms$mse
   msp  <- ms$msp
@@ -365,4 +365,4 @@ rr_anova_cis <- function(data, level = 0.95, ci.type = "mls", N = 1e5){
   RES
 }
 
-rr_anova_cis(data1, ci.type = "gpq", level=0.9)
+rr_anova_cis(data2, ci.type = "gpq", level=0.95)

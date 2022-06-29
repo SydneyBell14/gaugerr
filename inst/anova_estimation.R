@@ -61,7 +61,7 @@ balanced_mean_squares("kf_rr.csv")$mse
 
 # ANOVA point estimates and REML estimates are equal in this setting
 rr_anova_estimates <- function(data) {
-  ms <- balanced_mean_squares(data2)
+  ms <- balanced_mean_squares(data1)
 
   mse  <- ms$mse
   msp  <- ms$msp

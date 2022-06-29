@@ -1,12 +1,13 @@
 Package: gaugerr
-Title: What the Package Does (One Line, Title Case)
+Title: Analyzes Gauge Repeatability and Reproducibility Data 
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+    person("Sydney", "Bell", , "bells2@carleton.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: A system that uses common models to assess the uncertainty
+    associated with Gauge R&R data. You provide the data and specify the variables
+    and the package implements a modeling framework for the associated data
+License: use_mit_license()
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -54,7 +54,7 @@ balanced_mean_squares <- function(data) {
 
   list(msp = MSP, mso = MSO, mspo = MSPO, mse = MSE, p = p, o = o, r = r)
 }
-balanced_mean_squares(data1)
+balanced_mean_squares(data2)
 balanced_mean_squares("kf_rr.csv")$mse
 
 

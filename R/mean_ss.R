@@ -38,7 +38,8 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
     ungroup() %>%
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = ((ybarI-ybar)^2)) %>%
-    summarize(SSP = (sum(ssP1)/p) * r * o) #end SSP
+    distinct() %>%
+    summarize(SSP = (sum(ssP1)) * r * o) #end SSP
 
   SSO <- data %>%
     group_by({{operator}}) %>%
@@ -46,7 +47,8 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
     ungroup() %>%
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = (ybarJ-ybar)^2) %>%
-    summarize(SSO = (sum(ssP1)/p)* r * p) #end SSO
+    distinct() %>%
+    summarize(SSO = (sum(ssP1))* r * p) #end SSO
 
   SSE <- data%>%
     group_by({{operator}}, {{part}}) %>%

@@ -19,8 +19,9 @@
 #' @import tidyr
 #'
 #' @examples
+#' mydata <- data.frame(P=c(2,2,4,4,5,5),O=c(4,4,4,4,4,4),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 #' conf_intervals(mydata, alpha=0.1)
-#' conf_intervals(mydata2, part=p, operator=o, measurement=m, alpha=0.01)
+#' conf_intervals(mydata, part=P, operator=O, measurement=Y, alpha=0.01)
 conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05) {
   #calculations for the constants n,p,o and r that depend on the data frame
   n <- nrow(data)
@@ -38,29 +39,29 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
     mutate(ybarI = mean({{measurement}})) %>%
     ungroup() %>%
     mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (ybarI-ybar)^2) %>%
+    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) %>%
     distinct() %>%
-    summarize(SSP = sum(ssP1)* r * o)
+    summarize(SSP = sum(.data$ssP1)* r * o)
   #SSO: sum of squares for operator
   SSO <- data %>%
     group_by({{operator}}) %>%
     mutate(ybarJ = mean({{measurement}})) %>%
     ungroup() %>%
     mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (ybarJ-ybar)^2) %>%
+    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
     distinct() %>%
-    summarize(SSO = sum(ssP1)* r * p)
+    summarize(SSO = sum(.data$ssP1)* r * p)
   #SSE: sum of squares for equipment (part/operator interaction)
   SSE <- data%>%
     group_by({{operator}}, {{part}}) %>%
     mutate(ybar2 = mean({{measurement}})) %>%
-    summarize(SSe = sum((ybar2-{{measurement}})^2)) %>%
+    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
     ungroup()%>%
-    summarize(SSE=sum(SSe)) # end SSE
+    summarize(SSE=sum(.data$SSe)) # end SSE
   #SST: the total variance for sum of squares
   SST<- data%>%
-    summarize(var = var({{measurement}}))%>%
-    summarize(MSPO = var*(n-1)) # end SST
+    summarize(varT = var({{measurement}}))%>%
+    summarize(MSPO = .data$varT*(n-1)) # end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
 

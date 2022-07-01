@@ -3,6 +3,7 @@
 export(conf_intervals)
 export(conf_intervals_gpq)
 export(gauge_variance)
+export(gauge_variance_per)
 export(mean_ss)
 export(point_estimate)
 export(square_val)

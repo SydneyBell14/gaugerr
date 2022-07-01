@@ -64,14 +64,9 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
     pull() # end SSE
   #SST: the total variance for sum of squares
   SST<- data%>%
-<<<<<<< HEAD
-    summarize(varT = stats::var({{measurement}}))%>%
-    summarize(MSPO = .data$varT*(n-1)) # end SST
-=======
     summarize(varT = var({{measurement}}))%>%
     summarize(MSPO = .data$varT*(n-1)) %>%
     pull() # end SST
->>>>>>> b91dd5310bcece82e44e7073af56e75199b928fb
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST - sum(SSP, SSO, SSE)
 
@@ -144,39 +139,20 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
   estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
                 names_to = "name", values_to = "estimate") %>% select(2)
   est.quant <- data.frame(quantity, estimators)
-<<<<<<< HEAD
-  limits <- bind_rows(stats::quantile(gpq_repeat, probs, na.rm = TRUE),
-                      stats::quantile(gpq_part, probs, na.rm = TRUE),
-                      stats::quantile(gpq_oper, probs, na.rm = TRUE),
-                      stats::quantile(gpq_po, probs, na.rm = TRUE),
-                      stats::quantile(gpq_repeat, probs, na.rm = TRUE),
-                      stats::quantile(gpq_repro, probs, na.rm = TRUE),
-                      stats::quantile(gpq_gauge, probs, na.rm = TRUE),
-                      stats::quantile(gpq_part_gauge, probs, na.rm = TRUE),
-                      stats::quantile(gpq_gauge_total, probs, na.rm = TRUE),
-                      stats::quantile(gpq_part_repeat, probs, na.rm = TRUE)
-=======
   limits <- bind_rows(quantile(gpq_repeat, probs, na.rm = TRUE),
                       quantile(gpq_part, probs, na.rm = TRUE),
                       quantile(gpq_oper, probs, na.rm = TRUE),
                       quantile(gpq_po, probs, na.rm = TRUE),
                       quantile(gpq_total, probs, na.rm = TRUE),
-                      # quantile(gpq_repeat, probs, na.rm = TRUE),
                       quantile(gpq_repro, probs, na.rm = TRUE),
                       quantile(gpq_gauge, probs, na.rm = TRUE),
                       quantile(gpq_part_gauge, probs, na.rm = TRUE),
                       quantile(gpq_gauge_total, probs, na.rm = TRUE),
                       quantile(gpq_part_repeat, probs, na.rm = TRUE)
->>>>>>> b91dd5310bcece82e44e7073af56e75199b928fb
   )
   colnames(limits) <- c("lower", "upper")
 
   # building the data frame for the estimate, upper and lower limits of the CI
-
-  ### Error was here
-    # GPQ <- est.quant %>%
-  #   mutate(lower = pmax(0,estimate - limits$lower))%>%
-  #   mutate(upper = estimate + limits$upper)
 
   # Returning estimates and lims
 

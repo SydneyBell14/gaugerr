@@ -60,7 +60,7 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
     summarize(SSE=sum(.data$SSe)) # end SSE
   #SST: the total variance for sum of squares
   SST <- data%>%
-    summarize(varT = var({{measurement}}))%>%
+    summarize(varT = stats::var({{measurement}}))%>%
     summarize(MSPO = .data$varT*(n-1)) # end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
@@ -73,6 +73,6 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
 
 
   #return statement for the function, outputs the values
-  return(c(MSP, MSO, MSE, MSPO))
+  return(cbind(MSP=MSP, MSO=MSO, MSE=MSE, MSPO=MSPO))
 
 }

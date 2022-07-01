@@ -61,7 +61,7 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
     summarize(SSE=sum(.data$SSe)) # end SSE
   #SST: the total variance for sum of squares
   SST<- data%>%
-    summarize(varT = var({{measurement}}))%>%
+    summarize(varT = stats::var({{measurement}}))%>%
     summarize(MSPO = .data$varT*(n-1)) # end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
@@ -84,10 +84,10 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
   pr_ratio <- pmax(0,s2_p/MSE)
 
   # coefficients based on N the number of simulations
-  W1 <- rchisq(N, p - 1)
-  W2 <- rchisq(N, o - 1)
-  W3 <- rchisq(N, (o - 1) * (p - 1))
-  W4 <- rchisq(N, p * o * (r - 1))
+  W1 <- stats::rchisq(N, p - 1)
+  W2 <- stats::rchisq(N, o - 1)
+  W3 <- stats::rchisq(N, (o - 1) * (p - 1))
+  W4 <- stats::rchisq(N, p * o * (r - 1))
 
   # the estimators for the gpq calculations
   gpq_part  <- pmax(0, ((p - 1) * MSP) / (o * r * W1) -
@@ -113,8 +113,8 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
     (p * o * (r - 1)^2 * MSE) / (r * W4)
 
   #coefficients for the repeat upper and lower bounds
-  G4 <- 1-qf(alpha/2, Inf, p*o*(r-1))
-  H4 <- qf(1-alpha/2, Inf, p*o*(r-1))-1
+  G4 <- 1-stats::qf(alpha/2, Inf, p*o*(r-1))
+  H4 <- stats::qf(1-alpha/2, Inf, p*o*(r-1))-1
   repeat.lower <- (1-G4)*MSE
   repeat.upper <- (1+H4)*MSE
 
@@ -135,16 +135,16 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
   estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
                 names_to = "name", values_to = "estimate") %>% select(2)
   est.quant <- data.frame(quantity, estimators)
-  limits <- bind_rows(quantile(gpq_repeat, probs, na.rm = TRUE),
-                      quantile(gpq_part, probs, na.rm = TRUE),
-                      quantile(gpq_oper, probs, na.rm = TRUE),
-                      quantile(gpq_po, probs, na.rm = TRUE),
-                      quantile(gpq_repeat, probs, na.rm = TRUE),
-                      quantile(gpq_repro, probs, na.rm = TRUE),
-                      quantile(gpq_gauge, probs, na.rm = TRUE),
-                      quantile(gpq_part_gauge, probs, na.rm = TRUE),
-                      quantile(gpq_gauge_total, probs, na.rm = TRUE),
-                      quantile(gpq_part_repeat, probs, na.rm = TRUE)
+  limits <- bind_rows(stats::quantile(gpq_repeat, probs, na.rm = TRUE),
+                      stats::quantile(gpq_part, probs, na.rm = TRUE),
+                      stats::quantile(gpq_oper, probs, na.rm = TRUE),
+                      stats::quantile(gpq_po, probs, na.rm = TRUE),
+                      stats::quantile(gpq_repeat, probs, na.rm = TRUE),
+                      stats::quantile(gpq_repro, probs, na.rm = TRUE),
+                      stats::quantile(gpq_gauge, probs, na.rm = TRUE),
+                      stats::quantile(gpq_part_gauge, probs, na.rm = TRUE),
+                      stats::quantile(gpq_gauge_total, probs, na.rm = TRUE),
+                      stats::quantile(gpq_part_repeat, probs, na.rm = TRUE)
   )
   colnames(limits) <- c("lower", "upper")
 

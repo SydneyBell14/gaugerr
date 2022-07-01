@@ -60,7 +60,7 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
     summarize(SSE=sum(.data$SSe)) # end SSE
   #SST: the total variance for sum of squares
   SST<- data%>%
-    summarize(varT = var({{measurement}}))%>%
+    summarize(varT = stats::var({{measurement}}))%>%
     summarize(MSPO = .data$varT*(n-1)) # end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
@@ -83,29 +83,29 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   pr_ratio <- pmax(0,s2_p/MSE)
 
   # coefficients
-  G1 <- 1 - qf(alpha/2, Inf, p - 1)
-  G2 <- 1 - qf(alpha/2, Inf, o - 1)
-  G3 <- 1 - qf(alpha/2, Inf, (p-1) * (o-1))
-  G4 <- 1 - qf(alpha/2, Inf, p * o * (r - 1))
-  H1 <- qf(1 - alpha/2, Inf, p - 1) - 1
-  H2 <- qf(1 - alpha/2, Inf, o - 1) - 1
-  H3 <- qf(1 - alpha/2, Inf, (p-1) * (o-1)) - 1
-  H4 <- qf(1 - alpha/2, Inf, p * o * (r - 1)) - 1
-  F1 <- qf(1 - alpha/2, p - 1, (p - 1) * (o - 1))
-  F2 <- qf(alpha/2, p - 1, (p - 1) * (o - 1))
-  F3 <- qf(1 - alpha/2, p - 1, o - 1)
-  F4 <- qf(alpha/2, p - 1, o - 1)
-  F5 <- qf(1 - alpha/2, o - 1, (p - 1) *(o - 1))
-  F6 <- qf(alpha/2, o - 1, (p - 1) *(o - 1))
-  F7 <- qf(1 - alpha/2, (p - 1) * (o - 1), p * o * (r - 1))
-  F8 <- qf(alpha/2, (p - 1) * (o - 1), p * o * (r - 1))
-  F9 <- qf(1 - alpha/2, p - 1, p * o * (r - 1))
-  F10 <- qf(alpha/2, p - 1, p * o * (r - 1))
-  F11 <- qf(1 - alpha/2, o - 1, p * o * (r - 1))
-  F12 <- qf(alpha/2, o - 1, p * o * (r - 1))
+  G1 <- 1 - stats::qf(alpha/2, Inf, p - 1)
+  G2 <- 1 - stats::qf(alpha/2, Inf, o - 1)
+  G3 <- 1 - stats::qf(alpha/2, Inf, (p-1) * (o-1))
+  G4 <- 1 - stats::qf(alpha/2, Inf, p * o * (r - 1))
+  H1 <- stats::qf(1 - alpha/2, Inf, p - 1) - 1
+  H2 <- stats::qf(1 - alpha/2, Inf, o - 1) - 1
+  H3 <- stats::qf(1 - alpha/2, Inf, (p-1) * (o-1)) - 1
+  H4 <- stats::qf(1 - alpha/2, Inf, p * o * (r - 1)) - 1
+  F1 <- stats::qf(1 - alpha/2, p - 1, (p - 1) * (o - 1))
+  F2 <- stats::qf(alpha/2, p - 1, (p - 1) * (o - 1))
+  F3 <- stats::qf(1 - alpha/2, p - 1, o - 1)
+  F4 <- stats::qf(alpha/2, p - 1, o - 1)
+  F5 <- stats::qf(1 - alpha/2, o - 1, (p - 1) *(o - 1))
+  F6 <- stats::qf(alpha/2, o - 1, (p - 1) *(o - 1))
+  F7 <- stats::qf(1 - alpha/2, (p - 1) * (o - 1), p * o * (r - 1))
+  F8 <- stats::qf(alpha/2, (p - 1) * (o - 1), p * o * (r - 1))
+  F9 <- stats::qf(1 - alpha/2, p - 1, p * o * (r - 1))
+  F10 <- stats::qf(alpha/2, p - 1, p * o * (r - 1))
+  F11 <- stats::qf(1 - alpha/2, o - 1, p * o * (r - 1))
+  F12 <- stats::qf(alpha/2, o - 1, p * o * (r - 1))
   G13 <- ((F1 - 1)^2 - G1^2 * F1^2 - H3^2) / F1
   G23 <- ((F5 - 1)^2 - G2^2 * F5^2 - H3^2) / F5
-  G23.star <- (1 - 1/qf(1-alpha/2, p * (o - 1), Inf))^2 * (p^2 / (p - 1)) -
+  G23.star <- (1 - 1/stats::qf(1-alpha/2, p * (o - 1), Inf))^2 * (p^2 / (p - 1)) -
       G2^2 / (p-1) - G3^2 * (p-1)
   G24 <- ((1 - F11)^2 - G2^2 * F11^2 - H4^2) / F11
   G34 <- ((1 - F7)^2 - G3^2 * F7^2 - H4^2) / F7

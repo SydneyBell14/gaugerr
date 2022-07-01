@@ -5,8 +5,8 @@ Authors@R:
     person("Sydney", "Bell", , "bells2@carleton.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-5180-4066"))
 Description: A system that uses common models to assess the uncertainty
-    associated with Gauge R&R data. You provide the data and specify the variables
-    and the package implements a modeling framework for the associated data
+    associated with Gauge RR data. You provide the data and specify the variables
+    and the package implements a modeling framework for the associated data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

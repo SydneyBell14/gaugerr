@@ -41,7 +41,8 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = ((.data$ybarI-.data$ybar)^2)) %>%
     distinct() %>%
-    summarize(SSP = (sum(.data$ssP1)) * r * o)
+    summarize(SSP = (sum(.data$ssP1)) * r * o) %>%
+    pull()
   #SSO: sum of squares for operator
   SSO <- data %>%
     group_by({{operator}}) %>%
@@ -50,18 +51,21 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
     distinct() %>%
-    summarize(SSO = (sum(.data$ssP1))* r * p)
+    summarize(SSO = (sum(.data$ssP1))* r * p) %>%
+    pull()
   #SSE: sum of squares for equipment (part/operator interaction)
   SSE <- data%>%
     group_by({{operator}}, {{part}}) %>%
     mutate(ybar2 = mean({{measurement}})) %>%
     summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
     ungroup() %>%
-    summarize(SSE=sum(.data$SSe)) # end SSE
+    summarize(SSE=sum(.data$SSe)) %>%
+    pull()# end SSE
   #SST: the total variance for sum of squares
   SST <- data%>%
     summarize(varT = stats::var({{measurement}}))%>%
-    summarize(MSPO = .data$varT*(n-1)) # end SST
+    summarize(MSPO = .data$varT*(n-1)) %>%
+    pull()# end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
 

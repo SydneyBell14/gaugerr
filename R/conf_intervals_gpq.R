@@ -42,7 +42,8 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = (.data$ybarI-.data$ybar)^2) %>%
     distinct() %>%
-    summarize(SSP = sum(.data$ssP1)* r * o)
+    summarize(SSP = sum(.data$ssP1)* r * o) %>%
+    pull()
   #SSO: sum of squares for operator
   SSO <- data %>%
     group_by({{operator}}) %>%
@@ -51,20 +52,28 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
     mutate(ybar = mean({{measurement}})) %>%
     summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
     distinct() %>%
-    summarize(SSO = sum(.data$ssP1)* r * p)
+    summarize(SSO = sum(.data$ssP1)* r * p) %>%
+    pull()
   #SSE: sum of squares for equipment (part/operator interaction)
   SSE <- data%>%
     group_by({{operator}}, {{part}}) %>%
     mutate(ybar2 = mean({{measurement}})) %>%
     summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
     ungroup()%>%
-    summarize(SSE=sum(.data$SSe)) # end SSE
+    summarize(SSE=sum(.data$SSe)) %>%
+    pull() # end SSE
   #SST: the total variance for sum of squares
   SST<- data%>%
+<<<<<<< HEAD
     summarize(varT = stats::var({{measurement}}))%>%
     summarize(MSPO = .data$varT*(n-1)) # end SST
+=======
+    summarize(varT = var({{measurement}}))%>%
+    summarize(MSPO = .data$varT*(n-1)) %>%
+    pull() # end SST
+>>>>>>> b91dd5310bcece82e44e7073af56e75199b928fb
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
-  SSPO <- SST-sum(SSP, SSO, SSE)
+  SSPO <- SST - sum(SSP, SSO, SSE)
 
   #calculations for MSP, MSO, MSE and MSPO
   MSP <- SSP/(p - 1)
@@ -73,15 +82,15 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
   MSPO <- SSPO/((p-1)*(o-1))
 
   #calculations for the point estimate values
-  s2_p <-pmax(0,(MSP-MSPO)/(o*r))
-  s2_o <- pmax(0,(MSO-MSPO)/(p*r))
-  s2_po <- pmax(0,(MSPO-MSE)/r)
-  s2_tot <- pmax(0,(p*MSP+o*MSO+(p*o-p-o)*MSPO+p*o*(r-1)*MSE)/(p*o*r))
-  s2_repro <- pmax(0,(MSO+(p-1)*MSPO-p*MSE)/(p*r))
-  s2_gauge <- pmax(0,(MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r))
-  pg_ratio <- pmax(0,s2_p / s2_gauge)
-  gt_ratio <- pmax(0,s2_gauge/s2_tot)
-  pr_ratio <- pmax(0,s2_p/MSE)
+  s2_p <- max(0,(MSP-MSPO)/(o*r))
+  s2_o <- max(0,(MSO-MSPO)/(p*r))
+  s2_po <- max(0,(MSPO-MSE)/r)
+  s2_tot <- max(0,(p*MSP+o*MSO+(p*o-p-o)*MSPO+p*o*(r-1)*MSE)/(p*o*r))
+  s2_repro <- max(0,(MSO+(p-1)*MSPO-p*MSE)/(p*r))
+  s2_gauge <- max(0,(MSO + (p-1)*MSPO + p*(r - 1)*MSE) / (p*r))
+  pg_ratio <- max(0,s2_p / s2_gauge)
+  gt_ratio <- max(0,s2_gauge/s2_tot)
+  pr_ratio <- max(0,s2_p/MSE)
 
   # coefficients based on N the number of simulations
   W1 <- stats::rchisq(N, p - 1)
@@ -135,6 +144,7 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
   estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
                 names_to = "name", values_to = "estimate") %>% select(2)
   est.quant <- data.frame(quantity, estimators)
+<<<<<<< HEAD
   limits <- bind_rows(stats::quantile(gpq_repeat, probs, na.rm = TRUE),
                       stats::quantile(gpq_part, probs, na.rm = TRUE),
                       stats::quantile(gpq_oper, probs, na.rm = TRUE),
@@ -145,12 +155,30 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
                       stats::quantile(gpq_part_gauge, probs, na.rm = TRUE),
                       stats::quantile(gpq_gauge_total, probs, na.rm = TRUE),
                       stats::quantile(gpq_part_repeat, probs, na.rm = TRUE)
+=======
+  limits <- bind_rows(quantile(gpq_repeat, probs, na.rm = TRUE),
+                      quantile(gpq_part, probs, na.rm = TRUE),
+                      quantile(gpq_oper, probs, na.rm = TRUE),
+                      quantile(gpq_po, probs, na.rm = TRUE),
+                      quantile(gpq_total, probs, na.rm = TRUE),
+                      # quantile(gpq_repeat, probs, na.rm = TRUE),
+                      quantile(gpq_repro, probs, na.rm = TRUE),
+                      quantile(gpq_gauge, probs, na.rm = TRUE),
+                      quantile(gpq_part_gauge, probs, na.rm = TRUE),
+                      quantile(gpq_gauge_total, probs, na.rm = TRUE),
+                      quantile(gpq_part_repeat, probs, na.rm = TRUE)
+>>>>>>> b91dd5310bcece82e44e7073af56e75199b928fb
   )
   colnames(limits) <- c("lower", "upper")
 
   # building the data frame for the estimate, upper and lower limits of the CI
-  GPQ <- est.quant %>%
-    mutate(lower = pmax(0,estimate - limits$lower))%>%
-    mutate(upper = estimate + limits$upper)
-  return(GPQ)
+
+  ### Error was here
+    # GPQ <- est.quant %>%
+  #   mutate(lower = pmax(0,estimate - limits$lower))%>%
+  #   mutate(upper = estimate + limits$upper)
+
+  # Returning estimates and lims
+
+  bind_cols(est.quant, limits)
 }

@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^gaugerr\.Rproj$
 ^LICENSE\.md$
+^\.github$
+^README\.Rmd$

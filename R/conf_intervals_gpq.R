@@ -64,7 +64,7 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
     pull() # end SSE
   #SST: the total variance for sum of squares
   SST<- data%>%
-    summarize(varT = var({{measurement}}))%>%
+    summarize(varT = stats::var({{measurement}}))%>%
     summarize(MSPO = .data$varT*(n-1)) %>%
     pull() # end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
@@ -139,16 +139,16 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
   estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
                 names_to = "name", values_to = "estimate") %>% select(2)
   est.quant <- data.frame(quantity, estimators)
-  limits <- bind_rows(quantile(gpq_repeat, probs, na.rm = TRUE),
-                      quantile(gpq_part, probs, na.rm = TRUE),
-                      quantile(gpq_oper, probs, na.rm = TRUE),
-                      quantile(gpq_po, probs, na.rm = TRUE),
-                      quantile(gpq_total, probs, na.rm = TRUE),
-                      quantile(gpq_repro, probs, na.rm = TRUE),
-                      quantile(gpq_gauge, probs, na.rm = TRUE),
-                      quantile(gpq_part_gauge, probs, na.rm = TRUE),
-                      quantile(gpq_gauge_total, probs, na.rm = TRUE),
-                      quantile(gpq_part_repeat, probs, na.rm = TRUE)
+  limits <- bind_rows(stats::quantile(gpq_repeat, probs, na.rm = TRUE),
+                      stats::quantile(gpq_part, probs, na.rm = TRUE),
+                      stats::quantile(gpq_oper, probs, na.rm = TRUE),
+                      stats::quantile(gpq_po, probs, na.rm = TRUE),
+                      stats::quantile(gpq_total, probs, na.rm = TRUE),
+                      stats::quantile(gpq_repro, probs, na.rm = TRUE),
+                      stats::quantile(gpq_gauge, probs, na.rm = TRUE),
+                      stats::quantile(gpq_part_gauge, probs, na.rm = TRUE),
+                      stats::quantile(gpq_gauge_total, probs, na.rm = TRUE),
+                      stats::quantile(gpq_part_repeat, probs, na.rm = TRUE)
   )
   colnames(limits) <- c("lower", "upper")
 

@@ -26,6 +26,7 @@ returns a data frame with the values of the percent of variance contribution
 Percent of Variance Contribution
 }
 \examples{
+mydata <- data.frame(p=c(1,1,2,2), o=c(1,2,1,2), m=c(2.3,4.5,3.4,4.3))
 gauge_variance_per(mydata, part=p, operator=o, measurement=m)
 
 }

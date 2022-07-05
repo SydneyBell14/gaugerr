@@ -15,6 +15,7 @@
 #' @import dplyr
 #'
 #' @examples
+#' mydata <- data.frame(p=c(1,1,2,2), o=c(1,2,1,2), m=c(2.3,4.5,3.4,4.3))
 #' gauge_variance_per(mydata, part=p, operator=o, measurement=m)
 #'
 gauge_variance_per <- function(data, part=P, operator=O, measurement=Y) {

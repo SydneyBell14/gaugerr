@@ -118,7 +118,7 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   repeat.lower <- pmax(0,(1 - G4) * MSE)
   repeat.upper <- (1 + H4) * MSE
 
-  # CI upper and lower for s2_p
+  # CI upper and lower for s2_p (note: this is gamma_p in book)
   v_lp <- G1^2 * MSP^2 + H3^2 * MSPO^2 + G13 * MSP * MSPO
   v_up <- H1^2 * MSP^2 + G3^2 * MSPO^2 + H13 * MSP * MSPO
   parts.lower <- pmax(0, s2_p - sqrt(v_lp) / (o * r))
@@ -163,7 +163,7 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   repro.lower <- pmax(0, s2_repro - sqrt(v_lrepro))
   repro.upper <- s2_repro + sqrt(v_urepo)
 
-  # CI upper and lower for s2_gauge
+  # CI upper and lower for s2_gauge (note: this is gamma_p in the book)
   v_lm <- G2^2 * MSO^2 + G3^2 * (p - 1)^2 * MSPO^2 + G4^2 * p^2 * (r - 1)^2 * MSE^2
   v_um <- H2^2 * MSO^2 + H3^2 * (p - 1)^2 * MSPO^2 + H4^2 * p^2 * (r - 1)^2 * MSE^2
   gauge.lower <- pmax(0, s2_gauge - sqrt(v_lm) / (p * r))

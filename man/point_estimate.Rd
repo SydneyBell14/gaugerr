@@ -2,7 +2,7 @@
 % Please edit documentation in R/point_estimate.R
 \name{point_estimate}
 \alias{point_estimate}
-\title{Title}
+\title{Point Estimates for Gauge R&R Analysis}
 \usage{
 point_estimate(data, part = P, operator = O, measurement = Y)
 }
@@ -31,7 +31,7 @@ gt_ratio: the gauge/total ratio (s2_gauge/s2_tot)
 pr_ratio: the part/reproducibility ratio (s2_p/s2_repro)
 }
 \description{
-Title
+Point Estimates for Gauge R&R Analysis
 }
 \examples{
 mydata <- data.frame(P=c(1,2), O=c(1,1), Y=c(5, 4))

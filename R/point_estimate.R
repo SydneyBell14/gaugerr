@@ -1,4 +1,4 @@
-#' Title
+#' @title Point Estimates for Gauge R&R Analysis
 #'
 #' @param data a data frame consisting of gauge R&R data to run the analysis
 #' @param part a column of the data frame that has the part labels for the

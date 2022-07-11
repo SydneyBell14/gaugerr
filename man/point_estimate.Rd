@@ -20,12 +20,12 @@ object collected}
 }
 \value{
 a list of the point estimates
-s2_p: the point estimate for parts
-s2_o: the point estimate for operators
-s2_po the point estimate for the parts and operators
-s2_tot: the total point estimate
-s2_repro: the point estimate for reproducibility
-s2_gauge:
+s_p: the point estimate for parts
+s_o: the point estimate for operators
+s_po the point estimate for the parts and operators
+s_tot: the total point estimate
+s_repro: the point estimate for reproducibility
+s_gauge:
 pg_ratio: the part/gauge ratio (s2_p/s2_gauge)
 gt_ratio: the gauge/total ratio (s2_gauge/s2_tot)
 pr_ratio: the part/reproducibility ratio (s2_p/s2_repro)

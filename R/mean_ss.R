@@ -70,13 +70,13 @@ mean_ss <- function(data, part=P, operator=O, measurement=Y){
   SSPO <- SST-sum(SSP, SSO, SSE)
 
   #calculations for MSP, MSO, MSE and MSPO
-  MSP <- SSP/(p - 1)
-  MSO <- SSO/(o - 1)
-  MSE <- SSE/(p * o * (r - 1))
-  MSPO <- SSPO/((p-1)*(o-1))
+  s_p <- SSP/(p - 1)
+  s_o <- SSO/(o - 1)
+  s_e <- SSE/(p * o * (r - 1))
+  s_po <- SSPO/((p-1)*(o-1))
 
 
   #return statement for the function, outputs the values
-  return(cbind(MSP=MSP, MSO=MSO, MSE=MSE, MSPO=MSPO))
+  return(cbind(s_p=s_p, s_o=s_o, s_e=s_e, s_po=s_po))
 
 }

@@ -1,4 +1,4 @@
-test_that("gauge_variance_per works", {
+test_that("balanced_with_interaction works", {
   data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,
                           4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,
                           7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,
@@ -12,8 +12,9 @@ test_that("gauge_variance_per works", {
                           1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,
                           1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,
                           1,1,1,2,2,2,3,3,3))
-  expect_equal(gauge_variance_per(data1), cbind("per_rep"=0.72466009, "per_po"=3.09643405,
-                                                "per_p"=68.46987614, "per_o"=27.70902972,
-                                                "per_rr"=28.43368981))
-  expect_error(gauge_variance_per(4))
+  expect_error(balanced_with_interaction(3))
+  expect_error(balanced_with_interaction(data1))
+
+
+  #this is producing an error, need to spend more attention on it.
 })

@@ -63,19 +63,19 @@ gauge_variance <- function(data, part=P, operator=O, measurement=Y) {
   SSPO <- SST-sum(SSP, SSO, SSE)
 
   #calculations for MSP, MSO, MSE and MSPO
-  MSP <- SSP/(p - 1)
-  MSO <- SSO/(o - 1)
-  MSE <- SSE/(p * o * (r - 1))
-  MSPO <- SSPO/((p-1)*(o-1))
+  s_p <- SSP/(p - 1)
+  s_o <- SSO/(o - 1)
+  s_e <- SSE/(p * o * (r - 1))
+  s_po <- SSPO/((p-1)*(o-1))
 
   #variance calculations
-  var_rep <- pmax(0, MSE)
-  var_po <- pmax(0, MSPO - MSE)
-  var_p <- pmax(0, (MSP- MSPO)/(o *r))
-  var_o <- pmax(0, MSO-MSPO/(p*r))
-  var_rr <- pmax(0, MSE + (MSO-MSPO/(p*r)))
-  var_tot <- pmax(0,MSE) + pmax(0,((MSP- MSPO)/(o *r))) +
-      pmax(0,(MSO-MSPO/(p*r))) + pmax(0, MSPO - MSE)
+  var_rep <- pmax(0, s_e)
+  var_po <- pmax(0, s_po - s_e)
+  var_p <- pmax(0, (s_p- s_po)/(o *r))
+  var_o <- pmax(0, s_e-s_po/(p*r))
+  var_rr <- pmax(0, s_e + (s_o-s_po/(p*r)))
+  var_tot <- pmax(0,s_e) + pmax(0,((s_p- s_po)/(o *r))) +
+      pmax(0,(s_o-s_po/(p*r))) + pmax(0, s_po - s_e)
 
   quantity <- c("repeatability", "operators*parts",
                 "parts" ,"operators", "R&R", "total")

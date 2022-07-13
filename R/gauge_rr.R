@@ -4,4 +4,6 @@ gauge_rr <- function(data, part=P, operator=O, measurement=Y) {
   # Function to determine how many factors
   # Then run the appropriate function for the data and the gauge R&R
   # study
+
+  # output the study results
 }

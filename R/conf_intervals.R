@@ -132,10 +132,10 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   # CI upper and lower for mu_y
   K <- s_p + s_o - s_po
   C <- (s_p * sqrt(stats::qf(1-alpha, 1, p-1)) + s_o * sqrt(stats::qf(1-alpha, 1, o-1)) -
-          s_po * (sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1))))/K
-  #if (K<0) {
-    #K <- s_po
-    #C <- sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1))) }
+          s_po * (sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1))))/K)
+  if (K<0) {
+    K <- s_po
+    C <- sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1))) }
   mu_lower <- mu_y - (C*sqrt(K/(p*o*r)))
   mu_upper <- mu_y + (C*sqrt(K/(p*o*r)))
 

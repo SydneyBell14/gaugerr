@@ -14,16 +14,26 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   N <- data %>%
     group_by({{part}}) %>%
     summarize(N = sum({{operator}})) %>%
+    ungroup() %>%
+    distinct() %>%
+    summarize(N = sum(N)) %>%
     pull()
   r_O <- data %>%
     group_by({{part}}) %>%
     summarise(summation = sum({{operator}}^2)) %>%
-    summarise(r_O = (N-.data$summation/N)/(p-1)) %>%
+    ungroup()%>%
+    distinct() %>%
+    summarize(sum = sum(summation)) %>%
+    summarise(r_O = (N-.data$sum/N)/(p-1)) %>%
     pull()
   r_h <- data %>%
     group_by({{part}}) %>%
     summarize(summation = sum(1/{{operator}})) %>%
-    summarize(r_h = p/(.data$summation))
+    ungroup()%>%
+    distinct() %>%
+    summarize(sum = sum(summation)) %>%
+    summarize(r_h = p/(.data$sum)) %>%
+    pull()
   #i=1,...,p
   #j=1,...,r_i
 
@@ -31,30 +41,41 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   ybarI <- data %>%
     group_by({{part}}) %>%
     summarise(ybarI = (sum({{measurement}}))/o) %>%
+    ungroup()%>%
+    distinct() %>%
+    summarize(ybarI = mean(.data$ybarI)) %>%
     pull()
 
   ybar <- data %>%
     group_by({{part}}, {{operator}}) %>%
     summarize(ybar = (sum({{measurement}}))/N) %>%
+    ungroup()%>%
+    distinct() %>%
+    summarize(ybar = mean(.data$ybar)) %>%
     pull()
 
   s_p <- data %>%
     group_by({{part}}) %>%
-    summarize(s_p = (sum({{operator}})*(ybarI-ybar)^2)/(p-1)) %>%
+    summarize(s_p1 = (sum({{operator}})*(ybarI-ybar)^2)/(p-1)) %>%
+    ungroup() %>%
+    summarize(s_p = sum(.data$s_p1)) %>%
     pull()
 
   s_e <- data %>%
     group_by({{part}}, {{operator}}) %>%
-    summarize(s_e = (sum(({{measurement}}-ybar)^2))/(N-p)) %>%
+    summarize(s_e1 = (sum(({{measurement}}-ybar)^2))/(N-p)) %>%
+    ungroup() %>%
+    summarize(s_e = sum(.data$s_e1)) %>%
     pull()
 
   ybar_star <- data %>%
     group_by({{part}}) %>%
-    summarize((sum({{part}}))/p) %>%
+    summarize(ybar_star1 = (sum({{part}}))/p) %>%
+    ungroup() %>%
+    summarize(ybar_star = sum(.data$ybar_star1)) %>%
     pull()
 
   s_p_star <- data %>%
-    group_by({{part}}) %>%
     summarize(((sum((ybarI - ybar_star)^2))*r_h)/(p-1)) %>%
     pull()
 
@@ -93,6 +114,9 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   #confidence interval for SNR
 
   #confidence interval for C_p
+
+
+  return("plotting works")
 
 
 }

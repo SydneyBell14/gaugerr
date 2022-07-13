@@ -54,8 +54,12 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
   F2 <- stats::qf(alpha/2, p-1, (p*o*r)-p-o+1)
   F3 <- stats::qf(1- alpha/2, p-1, o-1)
   F4 <- stats::qf(alpha/2, p-1, o-1)
+  F5 <- stats::qf(1 - alpha/2, o - 1, (p - 1) *(o - 1))
+  F6 <- stats::qf(alpha/2, o - 1, (p - 1) *(o - 1))
   G13 <- ((F1 - 1)^2 - G1^2 * F1^2 - H3^2)/F1
+  G23 <- ((F5 - 1)^2 - G2^2 * F5^2 - H3^2) / F5
   H13 <- ((1-F2)^2 - H1^2 * F2^2 - G3^2)/F2
+  H23 <- ((1 - F6)^2 - H2^2 * F6^2 - G3^2) / F6
 
   #confidence interval for mu_Y
   C <- (s_p * sqrt(stats::qf(1-alpha, 1, p-1)) +
@@ -129,7 +133,7 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
   l_star <- (o*(1-G2)*s_o^2 - o*s_o*s_e + o*(F5-(1-G2)*F5^2)*s_e^2)/
     (p*(o*r -1)*s_o*s_e+(p*(1-G2)*s_o*s_p)/F4)
   u_star <- (o*(1+H2)*s_o^2 - o*s_o*s_e + o*(F6-(1+H2)*F6^2)*s_e^2)/
-    (p(o*r -1)*s_o*s_e+(p*(1+H2)*s_o*s_p)/F3)
+    (p*(o*r -1)*s_o*s_e+(p*(1+H2)*s_o*s_p)/F3)
   sigmaO_gammaY_lower <- l_star/(1+l_star)
   sigmaO_gammaY_upper <- u_star/(1+u_star)
 
@@ -141,6 +145,5 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
 
 
   #output for this function, not sure what form that will take
-
-
+  return("residual plot")
 }

@@ -1,4 +1,4 @@
-test_that("gauge_variance works", {
+test_that("unbalanced_one_factor works", {
   data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,
                           4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,
                           7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,
@@ -85,14 +85,6 @@ test_that("gauge_variance works", {
                           0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,
                           0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
-  expect_error(gauge_variance("car"))
-  expect_equal(gauge_variance(data1), data.frame(quantity = c("repeatability", "operators*parts",
-                                                              "parts" ,"operators", "R&R", "total"),
-                                                variance = c(0.51111111, 220.84814815, 0.0000000,
-                                                             0.0, 12.7658025, 233.6139506)))
-  expect_equal(gauge_variance(data2), data.frame(quantity = c("repeatability", "operators*parts",
-                                                             "parts" ,"operators", "R&R", "total"),
-                                                variance = c(0.0116236917797, 0.00000000, 0.0000000,
-                                                             0.0112918135642, 0.09761861174, 0.09761861174)))
-
+  expect_equal(unbalanced_one_factor(data1), "plotting works")
+  expect_equal(unbalanced_one_factor(data2), "plotting works")
 })

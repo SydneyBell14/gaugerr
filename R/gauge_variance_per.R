@@ -66,28 +66,27 @@ gauge_variance_per <- function(data, part=P, operator=O, measurement=Y) {
   SSPO <- SST-sum(SSP, SSO, SSE)
 
   #calculations for MSP, MSO, MSE and MSPO
-  MSP <- SSP/(p - 1)
-  MSO <- SSO/(o - 1)
-  MSE <- SSE/(p * o * (r - 1))
-  MSPO <- SSPO/((p-1)*(o-1))
-  total<- (pmax(0,MSE) +
-             pmax(0,((MSP- MSPO)/(o *r))) +
-             pmax(0,(MSO-MSPO/(p*r))) +
-             pmax(0, MSPO - MSE))
-    per_rep <- MSE
+  s_p <- SSP/(p - 1)
+  s_o <- SSO/(o - 1)
+  s_e <- SSE/(p * o * (r - 1))
+  s_po <- SSPO/((p-1)*(o-1))
+  total<- (pmax(0,s_e) +
+             pmax(0,((s_p- s_po)/(o *r))) +
+             pmax(0,(s_o-s_po/(p*r))) +
+             pmax(0, s_po - s_e))
+    per_rep <- s_e
     (pmax(0,per_rep)/total)*100
 
-    per_po <- (MSPO - MSE)
+    per_po <- (s_po - s_e)
     (pmax(0,per_po)/total)*100
-    per_p <- ((MSP- MSPO)/(o *r))
+    per_p <- ((s_p- s_po)/(o *r))
     (pmax(0,per_p)/total)*100
-    per_o <- (MSO-MSPO/(p*r))
+    per_o <- (s_o-s_po/(p*r))
     (pmax(0,per_o)/total)*100
-    per_rr <- (MSE + (MSO-MSPO/(p*r)))
+    per_rr <- (s_e + (s_o-s_po/(p*r)))
     (pmax(0,per_rr)/total)*100
 
     return(cbind(per_rep=(pmax(0,per_rep)/total)*100, per_po=(pmax(0,per_po)/total)*100,
                  per_p=(pmax(0,per_p)/total)*100, per_o=(pmax(0,per_o)/total)*100,
                  per_rr=(pmax(0,per_rr)/total)*100))
-
 }

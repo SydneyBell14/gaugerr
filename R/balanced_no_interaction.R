@@ -1,7 +1,7 @@
 balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
   # the model we are using Y_{ijk}=mu_Y + P_i + O_j + E_{ijk}
 
-  #calculation for n, p, o, and r
+  #calculations for the constants n,p,o and r that depend on the data frame
   n <- nrow(data)
   p <- nrow(data %>%
               group_by({{part}}) %>%
@@ -11,37 +11,48 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
 
-  # calculation for s_p^2, s_o^2, s_e^2 and ybar_star
-  s_p <- data %>%
-    group_by({{part}}) %>%
+  #SSP: sum of squares for parts
+  SSP <- data %>%
+    group_by({{part}})%>%
     mutate(ybarI = mean({{measurement}})) %>%
     ungroup() %>%
     mutate(ybar = mean({{measurement}})) %>%
-    summarize(s_p = ((sum((.data$ybarI-.data$ybar)^2))/(p-1))) %>%
+    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) %>%
+    distinct() %>%
+    summarize(SSP = sum(.data$ssP1)* r * o) %>%
     pull()
-
-  s_o <- data %>%
+  #SSO: sum of squares for operator
+  SSO <- data %>%
     group_by({{operator}}) %>%
     mutate(ybarJ = mean({{measurement}})) %>%
     ungroup() %>%
     mutate(ybar = mean({{measurement}})) %>%
-    summarize(s_o = ((sum((.data$ybarJ-.data$ybar)^2))/(o-1))) %>%
+    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
+    distinct() %>%
+    summarize(SSO = sum(.data$ssP1)* r * p) %>%
     pull()
+  #SSE: sum of squares for equipment (part/operator interaction)
+  SSE <- data%>%
+    group_by({{operator}}, {{part}}) %>%
+    mutate(ybar2 = mean({{measurement}})) %>%
+    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
+    ungroup()%>%
+    summarize(SSE=sum(.data$SSe)) %>%
+    pull() # end SSE
 
-  s_e <- data %>%
-    group_by({{operator}}) %>%
-    mutate(ybarJ = mean({{measurement}})) %>%
-    ungroup() %>%
-    group_by({{part}}) %>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar_star = (mean({{measurement}}))/(p*o*r)) %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(s_e = ((sum((.data$ybar-.data$ybarI-.data$ybarJ+.data$ybar_star)))/((p*r*o)-p-o+1)))%>%
-    pull()
+  #calculations for s_p, s_o, s_e and s_po
+  s_p <- SSP/(p - 1)
+  s_o <- SSO/(o - 1)
+  s_e <- SSE/(p * o * (r - 1))
 
   ybar_star <- data %>%
     summarize(ybar_star = (mean({{measurement}}))/(p*o*r))
+
+  ybarI <- data %>%
+    group_by({{part}}, {{operator}})%>%
+    summarize(yI = mean({{measurement}})) %>%
+    ungroup() %>%
+    summarize(ybarI = (sum(.data$yI))/(o*r))
 
   #constants use in confidence intervals for the model
   G1 <- 1 - stats::qf(alpha/2, Inf, p - 1)

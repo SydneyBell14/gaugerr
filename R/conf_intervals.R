@@ -64,35 +64,36 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   #SST: the total variance for sum of squares
   SST<- data%>%
     summarize(varT = stats::var({{measurement}}))%>%
-    summarize(MSPO = .data$varT*(n-1)) %>%
+    summarize(SST = .data$varT*(n-1)) %>%
     pull()# end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
 
-  #calculations for MSP, MSO, MSE and MSPO
+  #calculations for s_p, s_o, s_e and s_po
   s_p <- SSP/(p - 1)
   s_o <- SSO/(o - 1)
   s_e <- SSE/(p * o * (r - 1))
   s_po <- SSPO/((p-1)*(o-1))
 
   #calculations for the point estimate values
-  s2_p <-pmax(0,(s_p-s_po)/(o*r))
-  s2_o <- pmax(0,(s_o-s_po)/(p*r))
-  s2_po <- pmax(0,(s_po-s_e)/r)
-  s2_tot <- pmax(0,(p*s_p+o*s_o+(p*o-p-o)*s_po+p*o*(r-1)*s_e)/(p*o*r))
+
+  #s2_p <-pmax(0,(s_p-s_po)/(o*r))
+  #s2_o <- pmax(0,(s_o-s_po)/(p*r))
+  #s2_po <- pmax(0,(s_po-s_e)/r)
+  #s2_tot <- pmax(0,(p*s_p+o*s_o+(p*o-p-o)*s_po+p*o*(r-1)*s_e)/(p*o*r))
   s2_repro <- pmax(0,(s_o+(p-1)*s_po-p*s_e)/(p*r))
-  s2_gauge <- pmax(0,(s_o + (p-1)*s_po + p*(r - 1)*s_e) / (p*r))
+  #s2_gauge <- pmax(0,(s_o + (p-1)*s_po + p*(r - 1)*s_e) / (p*r))
   pg_ratio <- pmax(0,s2_p / s2_gauge)
   gt_ratio <- pmax(0,s2_gauge/s2_tot)
-  pr_ratio <- pmax(0,s2_p/s_e)
+  #pr_ratio <- pmax(0,s2_p/s_e)
 
   #calculation for the point estimates from book
   mu_y <- data %>%
     summarize(ybar = mean({{measurement}})) %>%
     pull()
-  gamma_p <- (s_p - s_po)/(o*r)
+  gamma_p <- pmax(0,(s_p - s_po)/(o*r))
 
-  gamma_m <- (s_o + (p-1)*s_po + p*(r-1)*s_e)/(p*r)
+  gamma_m <- pmax(0,(s_o + (p-1)*s_po + p*(r-1)*s_e)/(p*r))
 
   gamma_r <- gamma_p/gamma_m
 
@@ -164,39 +165,37 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
 
   #interval for c_p (requires LSL and USL)
 
-  # CI upper and lower for s2_repeat
-  repeat.lower <- pmax(0,(1 - G4) * s_e)
-  repeat.upper <- (1 + H4) * s_e
-
-  # CI upper and lower for s2_p (note: this is gamma_p in book)
-  v_lp <- G1^2 * s_p^2 + H3^2 * s_po^2 + G13 * s_p * s_po
-  v_up <- H1^2 * s_p^2 + G3^2 * s_po^2 + H13 * s_p * s_po
-  parts.lower <- pmax(0, s2_p - sqrt(v_lp) / (o * r))
-  parts.upper <- s2_p + sqrt(v_up) / (o * r)
-
-  # CI upper and lower for s2_o
+  #interval for sigma_o
+  sigma_o <- pmax(0,(s_o -s_po)/(p*r))
   v_lo <- G2^2 * s_o^2 + H3^2 * s_po^2 + G23 * s_o * s_po
   v_uo <- H2^2 * s_o^2 + G3^2 * s_po^2 + H23 * s_o * s_po
-  oper.lower <- pmax(0, s2_o - sqrt(v_lo) / (p * r))
-  oper.upper <- s2_o + sqrt(v_uo) / (p * r)
+  sigma_o_lower <- sigma_o - (sqrt(v_lo))/(p*r)
+  sigma_o_upper <- sigma_o + (sqrt(v_uo))/(p*r)
 
-  # CI upper and lower for s2_po
+  #interval for sigma_po
+  sigma_po <- pmax(0,(s_po - s_e)/r)
   v_lpo <- G3^2 * s_po^2 + H4^2 * s_e^2 + G34 * s_po * s_e
   v_upo <- H3^2 * s_po^2 + G4^2 * s_e^2 + H34 * s_po * s_e
-  po.lower <- pmax(0, s2_po - sqrt(v_lpo) / r)
-  po.upper <- s2_po + sqrt(v_upo) / r
+  sigma_po_lower <- sigma_po - (sqrt(v_lpo))/r
+  sigma_po_upper <- sigma_po + (sqrt(v_upo))/r
 
-  # CI upper and lower for s2_tot
-  v_lt <- G1^2 * p^2 * s_p^2 +
-      G2^2 * o^2 * s_o^2 +
-      G3^2 * (p * o - p - o)^2 * s_po^2 +
-      G4^2 * (p * o)^2 * (r - 1)^2 * s_e^2
-  v_ut <- H1^2 * p^2 * s_p^2 +
-      H2^2 * o^2 * s_o^2 +
-      H3^2 * (p * o - p - o)^2 * s_po^2 +
-      H4^2 * (p * o)^2 * (r - 1)^2 * s_e^2
-  total.lower <- pmax(0, s2_tot - sqrt(v_lt) / (p * o * r))
-  total.upper <- s2_tot + sqrt(v_ut) / (p * o * r)
+  #interval for sigma_e
+  sigma_e <- pmax(0,s_e)
+  sigma_e_lower <- pmax(0,(1-G4)*sigma_e)
+  sigma_e_upper <- (1+H4)*sigma_e
+
+  #interval for gamma_y
+  gamma_y <- pmax(0, (p*s_p + o*s_o + (p*o-p-o)*s_po + p*o*(r-1)*s_e)/(p*o*r))
+  v_lt <- G1^2 * p^2 * s_p^2 + G2^2 * o^2 * s_o^2 + G3^2 * (p*o-p-o)^2 * s_po^2 +
+    G4^2 * (p*o)^2 * (r-1)^2 * s_e^2
+  v_ut <- H1^2 * p^2 * s_p^2 + H2^2 * o^2 * s_o^2 + H3^2 * (p*o-p-o)* s_po^2 +
+    H4^2 * (p*o)^2 * (r-1)^2 * s_e^2
+  gamma_y_lower <- gamma_y - (sqrt(v_lt))/(p*o*r)
+  gamma_y_upper <- gamma_y + (sqrt(v_ut))/(p*o*r)
+
+  #interval for sigma_p/sigma_e
+  sigmaP_sigmaE_lower <- (s_po/(o*r*s_e*F9))*((s_p/s_po)-(1/(1-G1))+(s_po*F1*(1-F1*(1-G1)))/(s_p*(1-G1)))
+  sigmaP_sigmaE_upper <- (s_po/(o*r*s_e*F10))*((s_p/s_po)-(1/(1+H1))+(s_po*F2*(1-F2*(1+H1)))/(s_p*(1+H1)))
 
   # CI upper and lower for s2_repro
   v_lrepro <- (G2^2 * s_o^2 +
@@ -213,12 +212,6 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   repro.lower <- pmax(0, s2_repro - sqrt(v_lrepro))
   repro.upper <- s2_repro + sqrt(v_urepo)
 
-  # CI upper and lower for s2_gauge (note: this is gamma_m in the book)
-  v_lm <- G2^2 * s_o^2 + G3^2 * (p - 1)^2 * s_po^2 + G4^2 * p^2 * (r - 1)^2 * s_e^2
-  v_um <- H2^2 * s_o^2 + H3^2 * (p - 1)^2 * s_po^2 + H4^2 * p^2 * (r - 1)^2 * s_e^2
-  gauge.lower <- pmax(0, s2_gauge - sqrt(v_lm) / (p * r))
-  gauge.upper <- s2_gauge + sqrt(v_um) / (p * r)
-
   # CI upper and lower for pg_ratio
   pg_ratio_lower <- pmax(0, (p * (1 - G1) * (s_p - F1 * s_po)) /
                              (p * o * (r - 1) * s_e + o * (1 - G1) * F3 * s_o + o * (p - 1) * s_po))
@@ -229,21 +222,15 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   tg_ratio_lower <- 1 + pg_ratio_lower
   tg_ratio_upper <- 1 + pg_ratio_upper
 
-  # CI upper and lower for pr_ratio
-  pr_ratio_lower <- pmax(0, (s_po / (o * r * s_e * F9)) *
-                             ((s_p / s_po) - (1 / (1 - G1)) + (s_po * F1 * (1 - F1 * (1 - G1))) / (s_p * (1 - G1))))
-  pr_ratio_upper <- (s_po / (o * r * s_e * F10)) *
-      ((s_p / s_po) - (1 / (1 + H1)) + (s_po * F2 * (1 - F2 * (1 + H1))) / (s_p * (1 + H1)))
-
   # the columns for the data frame
-  quantity <- c("s2_repeat","s2_p","s2_o", "s2_po","s2_tot",
-                  "s2_repro", "s2_gauge", "pg_ratio","tg_ratio", "pr_ratio")
-  estimate <- c(s_e, s2_p, s2_o, s2_po, s2_tot,  s2_repro, s2_gauge,
-                  pg_ratio, gt_ratio, pr_ratio)
-  lower <- c(repeat.lower, parts.lower, oper.lower, po.lower, total.lower,
-               repro.lower, gauge.lower, pg_ratio_lower, 1/tg_ratio_upper, pr_ratio_lower)
-  upper <- c(repeat.upper, parts.upper, oper.upper, po.upper, total.upper,
-               repro.upper, gauge.upper,pg_ratio_upper, 1/tg_ratio_lower, pr_ratio_upper)
+  quantity <- c("repeat","part","operator", "part operator interaction","total",
+                  "s2_repro", "gauge", "pg_ratio","tg_ratio", "pr_ratio")
+  estimate <- c(sigma_e, gamma_p, sigma_o, sigma_po, gamma_y,  s2_repro, gamma_m,
+                  pg_ratio, gt_ratio, gamma_p/sigma_e)
+  lower <- c(sigma_e_lower, gamma_p_lower, sigma_o_lower, sigma_po_lower, gamma_y_lower,
+               repro.lower, gamma_m_lower, pg_ratio_lower, 1/tg_ratio_upper, sigmaP_sigmaE_lower)
+  upper <- c(sigma_e_upper, gamma_p_upper, sigma_o_upper, sigma_po_upper, gamma_y_upper,
+               repro.upper, gamma_m_upper,pg_ratio_upper, 1/tg_ratio_lower, sigmaP_sigmaE_upper)
 
   # cleaning the data for the data frame output using tidyr techniques
   upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),

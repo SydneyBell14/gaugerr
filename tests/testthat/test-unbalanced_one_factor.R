@@ -85,6 +85,5 @@ test_that("unbalanced_one_factor works", {
                           0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,
                           0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
-  expect_equal(unbalanced_one_factor(data1), "plotting works")
-  expect_equal(unbalanced_one_factor(data2), "plotting works")
+  expect_error(unbalanced_one_factor(5))
 })

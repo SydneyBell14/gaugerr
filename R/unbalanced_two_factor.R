@@ -1,3 +1,24 @@
+#' Unbalanced Two Factor Model
+#'
+#' @param data a data frame that contains measurements, operators and parts
+#' for a Gauge R&R analysis
+#' @param part a column of the data frame that has the part labels for the
+#' measurements
+#' @param operator a column of the data frame that has the operator labels
+#' for the measurements
+#' @param measurement a column of the data frame that has measurements of the
+#' object collected
+#' @param alpha the value for the confidence interval calculation (i.e. 95% CI
+#' would have alpha=0.05)
+#'
+#' @returna data frame of the values of the point estimates and the upper and
+#' lower bounds for each estimate
+#' @export
+#'
+#' @import dplyr
+#' @import tidyr
+#'
+#' @examples
 unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
   # the model that we will be using for this study
   # Y_{ijk} = mu_Y + P_i + O_j + (PO)_{ij} + E_{ijk}
@@ -14,72 +35,93 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
 
   r_h <- data %>%
     group_by({{part}},{{operator}}) %>%
-    summarize(frac = mean(1/{{operator}})) %>%
+    summarise(reps = n()) %>%
+    mutate(frac = 1/.data$reps) %>%
     ungroup() %>%
-    summarize(r_h = p*o*(sum(1/(.data$frac)))) %>%
-    pull()
-
-  s_p_star <- data %>%
-    group_by({{part}}) %>%
-    summarize(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar_star = ybarI/p)%>%
-    summarize(s_p_star = (o* r_h * (sum((.data$ybarI - .data$ybar_star)^2))/(p-1))) %>%
-    pull()
-
-  ybar_star <- data %>%
-    group_by({{part}}) %>%
-    summarize(ybar = mean({{measurement}})) %>%
-    ungroup() %>%
-    summarize(ybar_star = (sum(.data$ybar))/(p*o)) %>%
-    pull()
-
-  ybarI_star <- data %>%
-    group_by({{operator}}) %>%
-    summarize(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    summarize(ybarI_star = sum(.data$ybarI)) %>%
+    summarize(r_h = (p*o)/(sum(.data$frac))) %>%
     pull()
 
   ybarIJ <- data %>%
-    group_by({{operator}}, {{part}}) %>%
-    summarize(ybarIJ = ({{measurement}})/({{operator}})) %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    summarise(mean = .data$total/.data$reps)
+
+  ybarI_star <- data %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps)%>%
     ungroup() %>%
-    summarize(ybarIJ = (sum(.data$ybarIJ)))
+    group_by({{operator}}) %>%
+    summarize(ybarI_star = (sum(.data$mean))/o)
 
   ybarJ_star <- data %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps)%>%
+    ungroup() %>%
     group_by({{part}}) %>%
-    summarize(ybarJ = mean({{measurement}})) %>%
-    ungroup()%>%
-    summarize(ybarJ_star = (sum(.data$ybarJ))/p)
+    summarise(ybarJ_star = (sum(.data$mean))/p)
+
+  ybar_star <- data %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps)%>%
+    ungroup() %>%
+    summarise(ybar_star = (sum(.data$mean))/(p*o))
+
+  s_p_star <- data %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps)%>%
+    ungroup() %>%
+    mutate(ybar_star = (sum(.data$mean))/(p*o)) %>%
+    group_by({{operator}}) %>%
+    mutate(ybarI_star = (sum(.data$mean))/o) %>%
+    ungroup() %>%
+    summarise(s_p_star = (o*r_h*sum((.data$ybar_star - .data$ybarI_star)^2))/(p-1)) %>%
+    pull()
 
   s_o_star <- data %>%
-    group_by({{operator}}) %>%
-    mutate(squares = (ybarJ_star - ybar_star)^2) %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps) %>%
     ungroup() %>%
-    summarize(s_o_star = p*r_h*(sum(.data$squares))/(o-1))
+    mutate(ybar_star = (sum(.data$mean))/(p*o)) %>%
+    group_by({{part}}) %>%
+    mutate(ybarJ_star = (sum(.data$mean))/p) %>%
+    ungroup() %>%
+    summarize(s_o_star = (p*r_h*(sum((.data$ybarJ_star-.data$ybar_star)^2)))/(o-1))%>%
+    pull()
 
   s_po_star <- data %>%
     group_by({{part}}, {{operator}}) %>%
-    mutate(squares = (ybarIJ - ybarI_star - ybarJ_star + ybar_star)^2) %>%
+    summarise(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps)%>%
     ungroup() %>%
-    summarize(s_po_star = (r_h * sum(.data$squares))/((p-1)*(o-1)))
+    mutate(ybar_star = (sum(.data$mean))/(p*o)) %>%
+    group_by({{part}}) %>%
+    mutate(ybarJ_star = (sum(.data$mean))/p) %>%
+    ungroup() %>%
+    group_by({{operator}}) %>%
+    mutate(ybarI_star = (sum(.data$mean))/o) %>%
+    ungroup() %>%
+    summarize(s_po_star = (r_h * sum((ybarIJ - .data$ybarI_star - .data$ybarJ_star + .data$ybar_star)))/((p-1)*(o-1))) %>%
+    pull()
 
   s_e <- data %>%
     group_by({{part}}, {{operator}}) %>%
-    mutate(ybarIJ = mean({{measurement}})) %>%
+    summarize(total = sum({{measurement}}),
+              reps = n()) %>%
+    mutate(mean = .data$total/.data$reps) %>%
     ungroup() %>%
-    group_by({{part}}) %>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    summarize(s_e = (sum((ybarIJ - ybarI)^2))/(n-(p*o))) %>%
-    pull()
-
-  ybar_star <- data %>%
-    group_by({{part}}) %>%
-    summarize(ybar = mean({{measurement}})) %>%
-    ungroup() %>%
-    summarize(ybar_star = (sum(.data$ybar))/p) %>%
+    summarize(s_e = (sum(.data$total - .data$mean)^2)/(n-(p*o))) %>%
     pull()
 
   #constants used for confidence interval calculation
@@ -103,6 +145,11 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
   #terms used for the two factor analysis
   K <- s_p_star + s_o_star - s_po_star
   C <- (s_p_star * sqrt(stats::qf(1-alpha, 1, p-1)) + s_o_star * sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1))))/K
+  if(K<0){
+    K <- s_po_star
+    C <- sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1)))
+  }
+
   gamma_p <- (s_p_star - s_po_star)/(o*r_h)
   v_lp <- G1^2 * s_p_star^2 + H3^2 * s_po_star^2 + G13 * s_p_star * s_po_star
   v_up <- H1^2 * s_p_star^2 + G3^2 * s_po_star^2 + H13 * s_p_star * s_po_star
@@ -147,7 +194,23 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
   # C_p_lower <- (USL-LSL)/(6*sqrt(gamma_p_upper))
   # C_p_upper <- (USL-LSL)/(6*sqrt(gamma_p_lower))
 
+  quantity <- c("part", "gauge", "mu", "gamma_r")
+  estimate <- c(gamma_p, gamma_m, mu_y, gamma_r)
+  lower <- c(gamma_p_lower, gamma_m_lower, mu_y_lower, gamma_r_lower)
+  upper <- c(gamma_p_upper, gamma_m_upper, mu_y_upper, gamma_r_upper)
 
-  return("plotting")
+  # cleaning the data for the data frame output using tidyr techniques
+  upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "upper")%>%
+    select(2)
+  lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "lower") %>%
+    select(2)
+  estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
+                                                          names_to = "measure", values_to = "estimate")%>%
+    select(2)
+
+  #return statement for the data frame with estimate, lower and upper bounds of the CI
+  return(cbind(quantity, estimate.value, lower.bounds, upper.bounds))
 
 }

@@ -80,10 +80,10 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   #s2_p <-pmax(0,(s_p-s_po)/(o*r))
   #s2_o <- pmax(0,(s_o-s_po)/(p*r))
   #s2_po <- pmax(0,(s_po-s_e)/r)
-  #s2_tot <- pmax(0,(p*s_p+o*s_o+(p*o-p-o)*s_po+p*o*(r-1)*s_e)/(p*o*r))
+  s2_tot <- pmax(0,(p*s_p+o*s_o+(p*o-p-o)*s_po+p*o*(r-1)*s_e)/(p*o*r))
   s2_repro <- pmax(0,(s_o+(p-1)*s_po-p*s_e)/(p*r))
-  #s2_gauge <- pmax(0,(s_o + (p-1)*s_po + p*(r - 1)*s_e) / (p*r))
-  pg_ratio <- pmax(0,s2_p / s2_gauge)
+  s2_gauge <- pmax(0,(s_o + (p-1)*s_po + p*(r - 1)*s_e) / (p*r))
+  pg_ratio <- pmax(0,s_p / s2_gauge)
   gt_ratio <- pmax(0,s2_gauge/s2_tot)
   #pr_ratio <- pmax(0,s2_p/s_e)
 

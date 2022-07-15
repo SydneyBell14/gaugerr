@@ -1,3 +1,24 @@
+#' Balanced Without Interaction
+#'
+#' @param data a data frame that contains measurements, operators and parts
+#' for a Gauge R&R analysis
+#' @param part a column of the data frame that has the part labels for the
+#' measurements
+#' @param operator a column of the data frame that has the operator labels
+#' for the measurements
+#' @param measurement a column of the data frame that has measurements of the
+#' object collected
+#' @param alpha the value for the confidence interval calculation (i.e. 95% CI
+#' would have alpha=0.05)
+#'
+#' @return a data frame of the values of the point estimates and the upper and
+#' lower bounds for each estimate
+#' @export
+#'
+#' @import dplyr
+#' @import tidyr
+#'
+#' @examples
 balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
   # the model we are using Y_{ijk}=mu_Y + P_i + O_j + E_{ijk}
 
@@ -11,48 +32,51 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
 
-  #SSP: sum of squares for parts
-  SSP <- data %>%
-    group_by({{part}})%>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) %>%
-    distinct() %>%
-    summarize(SSP = sum(.data$ssP1)* r * o) %>%
-    pull()
-  #SSO: sum of squares for operator
-  SSO <- data %>%
-    group_by({{operator}}) %>%
-    mutate(ybarJ = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
-    distinct() %>%
-    summarize(SSO = sum(.data$ssP1)* r * p) %>%
-    pull()
-  #SSE: sum of squares for equipment (part/operator interaction)
-  SSE <- data%>%
-    group_by({{operator}}, {{part}}) %>%
-    mutate(ybar2 = mean({{measurement}})) %>%
-    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
-    ungroup()%>%
-    summarize(SSE=sum(.data$SSe)) %>%
-    pull() # end SSE
-
-  #calculations for s_p, s_o, s_e and s_po
-  s_p <- SSP/(p - 1)
-  s_o <- SSO/(o - 1)
-  s_e <- SSE/(p * o * (r - 1))
-
-  ybar_star <- data %>%
+  #ybar calculations
+  ybar <- data %>%
     summarize(ybar_star = (mean({{measurement}}))/(p*o*r))
 
   ybarI <- data %>%
-    group_by({{part}}, {{operator}})%>%
-    summarize(yI = mean({{measurement}})) %>%
+    group_by({{part}}) %>%
+    summarise(sum = sum({{measurement}})) %>%
+    summarise(ybarI = (.data$sum)/(o*r))
+
+  ybarJ <- data %>%
+    group_by({{operator}}) %>%
+    summarise(sum = sum({{measurement}})) %>%
+    summarise(ybarJ = (.data$sum)/(p*r))
+
+  ybarIJ <- data %>%
+    group_by({{part}}, {{operator}}) %>%
+    summarize(sum = sum({{measurement}})) %>%
+    summarise(ybarIJ = (.data$sum)/(r))
+
+  #s_p calculation
+  s_p <- data %>%
+    mutate(ybar = mean({{measurement}})) %>%
+    group_by({{part}}) %>%
+    summarise(ybarI = mean({{measurement}})) %>%
+    ungroup()%>%
+    summarise((o*r*sum((ybarI-ybar)^2))/(p-1))
+
+  #s_o calculation
+  s_o <- data %>%
+    mutate(ybar = mean({{measurement}})) %>%
+    group_by({{operator}}) %>%
+    summarise(ybarJ = mean({{measurement}})) %>%
+    ungroup()%>%
+    summarise((p*r*sum((ybarJ - ybar)^2))/(o-1))
+
+  #s_e calculation
+  s_e <- data %>%
+    mutate(ybar = mean({{measurement}})) %>%
+    group_by({{part}}) %>%
+    mutate(ybarI = mean({{measurement}})) %>%
     ungroup() %>%
-    summarize(ybarI = (sum(.data$yI))/(o*r))
+    group_by({{operator}}) %>%
+    mutate(ybarJ = mean({{measurement}})) %>%
+    ungroup() %>%
+    summarise((sum(({{measurement}} - ybarI - ybarJ + ybar)^2))/(p*o*r - p - o + 1))
 
   #constants use in confidence intervals for the model
   G1 <- 1 - stats::qf(alpha/2, Inf, p - 1)
@@ -81,8 +105,8 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
     K <- s_e
     C <- sqrt(stats::qf(1-alpha, 1, (p*o*r)-p-o+1))
   }
-  mu_Y_lower <- ybar_star - (C * sqrt((K)/(p*o*r)))
-  mu_Y_upper <- ybar_star + (C * sqrt((K)/(p*o*r)))
+  mu_Y_lower <- ybar - (C * sqrt((K)/(p*o*r)))
+  mu_Y_upper <- ybar + (C * sqrt((K)/(p*o*r)))
 
   #confidence interval for gamma_p
   v_lp <- G1^2 * s_p^2 + H3^2 * s_e^2 + G13 * s_p * s_e
@@ -108,6 +132,8 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
                       p*(F2-(1+H1)*F2^2)*s_e^2)/(
                         (o*(p*r -1)*s_p*s_e) + o*(1+H1)*F4*s_p*s_o)
 
+  gamma_r <- gamma_p/gamma_m
+
   #confidence interval for PTR
 
   #confidence interval for SNR
@@ -122,6 +148,7 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
   sigma_o_upper <- sigma_o + (sqrt(v_uo))/(p*r)
 
   #confidence interval for sigma_e
+  sigma_e <- gamma_m - sigma_o
   sigma_e_lower <- (1-G3)*s_e
   sigma_e_upper <- (1+H3)*s_e
 
@@ -148,13 +175,27 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
   sigmaO_gammaY_lower <- l_star/(1+l_star)
   sigmaO_gammaY_upper <- u_star/(1+u_star)
 
-  #graphing the intervals of PTR and SNR
+  #table of values for the confidence intervals
+  quantity <- c("repeat","part","operator", "total",
+                "gauge", "pr_ratio")
+  estimate <- c(sigma_e, gamma_p, sigma_o, gamma_y, gamma_m,
+                 gamma_p/sigma_e)
+  lower <- c(sigma_e_lower, gamma_p_lower, sigma_o_lower, gamma_y_lower,
+            gamma_m_lower, sigma_pe_lower)
+  upper <- c(sigma_e_upper, gamma_p_upper, sigma_o_upper, gamma_y_upper,
+            gamma_m_upper, sigma_pe_upper)
 
+  # cleaning the data for the data frame output using tidyr techniques
+  upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "upper")%>%
+    select(2)
+  lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "lower") %>%
+    select(2)
+  estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
+                                                          names_to = "measure", values_to = "estimate")%>%
+    select(2)
 
-  #graphing residual plots for the data
-
-
-
-  #output for this function, not sure what form that will take
-  return("residual plot")
+  #return statement for the data frame with estimate, lower and upper bounds of the CI
+  return(cbind(quantity, estimate.value, lower.bounds, upper.bounds))
 }

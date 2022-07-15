@@ -1,3 +1,24 @@
+#' Unbalanced One Factor Model
+#'
+#' @param data a data frame that contains measurements, operators and parts
+#' for a Gauge R&R analysis
+#' @param part a column of the data frame that has the part labels for the
+#' measurements
+#' @param operator a column of the data frame that has the operator labels
+#' for the measurements
+#' @param measurement a column of the data frame that has measurements of the
+#' object collected
+#' @param alpha the value for the confidence interval calculation (i.e. 95% CI
+#' would have alpha=0.05)
+#'
+#' @return a data frame of the values of the point estimates and the upper and
+#' lower bounds for each estimate
+#'
+#' @export
+#' @import dplyr
+#' @import tidyr
+#'
+#' @examples
 unbalanced_one_factor <- function(data, part=P, operator=O,
                                   measurement=Y, alpha=0.05){
   #model for this Y_{ij} = mu_Y + P_i + E_{ij}
@@ -23,19 +44,21 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
     summarise(summation = sum({{operator}}^2)) %>%
     ungroup()%>%
     distinct() %>%
-    summarize(sum = sum(summation)) %>%
+    summarize(sum = sum(.data$summation)) %>%
     summarise(r_O = (N-.data$sum/N)/(p-1)) %>%
     pull()
   r_h <- data %>%
     group_by({{part}}) %>%
-    summarize(summation = sum(1/{{operator}})) %>%
+    summarize(reps = n()) %>%
+    mutate(frac = 1/.data$reps) %>%
     ungroup()%>%
-    distinct() %>%
-    summarize(sum = sum(summation)) %>%
-    summarize(r_h = p/(.data$sum)) %>%
+    summarize(r_h = p/(sum(.data$frac))) %>%
     pull()
+
+
   #i=1,...,p
   #j=1,...,r_i
+
 
   #calculation for s_p, s_e, ybarI, ybar, s_p_star, and ybar_star
   ybarI <- data %>%
@@ -101,7 +124,7 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   gamma_p_upper <- gamma_p + (sqrt(v_up))/r_h
 
   #confidence interval for gamma_m
-  # gamma_m <- s_e
+  gamma_m <- s_e
   gamma_m_lower <- (1-G2)*s_e
   gamma_m_upper <- (1+H2)*s_e
 
@@ -115,8 +138,24 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
 
   #confidence interval for C_p
 
+  quantity <- c("part", "gauge", "mu", "gamma_r")
+  estimate <- c(gamma_p, gamma_m, ybar_star, gamma_p/gamma_m)
+  lower <- c(gamma_p_lower, gamma_m_lower, mu_lower, gamma_r_lower)
+  upper <- c(gamma_p_upper, gamma_m_upper, mu_upper, gamma_r_upper)
 
-  return("plotting works")
+  # cleaning the data for the data frame output using tidyr techniques
+  upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "upper")%>%
+    select(2)
+  lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "lower") %>%
+    select(2)
+  estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
+                                                          names_to = "measure", values_to = "estimate")%>%
+    select(2)
+
+  #return statement for the data frame with estimate, lower and upper bounds of the CI
+  return(cbind(quantity, estimate.value, lower.bounds, upper.bounds))
 
 
 }

@@ -85,7 +85,5 @@ test_that("balanced_no_interaction works", {
                           0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,
                           0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
-  expect_equal(balanced_no_interaction(data1), "residual plot")
-  expect_equal(balanced_no_interaction(data2), "residual plot")
   expect_error(balanced_no_interaction(7))
 })

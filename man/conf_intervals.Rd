@@ -30,7 +30,7 @@ bounds of the mls confidence interval.
 Modified large-sample (MLS) Confidence Interval Calculation
 }
 \examples{
-mydata <- data.frame(P=c(2,2,4,4,5,5),O=c(4,4,4,4,4,4),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
+mydata <- data.frame(P=c(1,1,2,2,3,3),O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 conf_intervals(mydata, alpha=0.1)
 conf_intervals(mydata, part=P, operator=O, measurement=Y, alpha=0.01)
 }

@@ -28,6 +28,14 @@ object collected}
 \item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
 would have alpha=0.05)}
 }
+\value{
+a data frame of the values of the point estimates and the upper and
+lower bounds for each estimate
+}
 \description{
 Unbalanced Two Factor Model
+}
+\examples{
+mydata <- data.frame(P=c(1,1,2,2,3,3),O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
+unbalanced_two_factor(mydata, alpha=0.01)
 }

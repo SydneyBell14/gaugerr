@@ -21,6 +21,7 @@ nrow(data.frame(data1))
 
 
 data2<- read_delim("kf_rr.csv", delim="\t")
+
 balanced_mean_squares <- function(data) {
   DT <- as.data.table(data)
 

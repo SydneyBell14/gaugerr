@@ -18,7 +18,8 @@
 #' @import dplyr
 #' @import tidyr
 #'
-#' @examples
+#' @examples mydata <- data.frame(P=c(1,1,1,2,2,2), O=c(1,2,3,1,2,3), Y=c(2,2.1,2.2,1.9,2.3,1.8))
+#' balanced_no_interaction(mydata, alpha=0.05)
 balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
   # the model we are using Y_{ijk}=mu_Y + P_i + O_j + E_{ijk}
 

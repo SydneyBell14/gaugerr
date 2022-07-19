@@ -28,11 +28,15 @@ balanced_with_interaction <- function(data, part=P, operator=O,
 
   # the model Y_{ijk} = mu_Y + P_i + O_j + (PO)_{ij} + E_{ijk}
 
+  part_var <- rlang::enquo(part)
+  oper_var <- rlang::enquo(operator)
+  y_var <- rlang::enquo(measurement)
+
   #if statement for the different types of confidence intervals
   if (conf_type == "mls"){
-    table <- conf_intervals(data, part, operator, measurement, alpha)
+    table <- conf_intervals(data, !!part_var, !!oper_var, !!y_var, alpha)
   }else if(conf_type == "gpq"){
-    table <- conf_intervals_gpq(data,part, operator, measurement, alpha)
+    table <- conf_intervals_gpq(data, !!part_var, !!oper_var, !!y_var, alpha)
   }
 
   # returning the output of the function with the estimates and the CIs

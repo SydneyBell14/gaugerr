@@ -16,36 +16,25 @@
 #' passed into the function
 #' @export
 #'
-#' @importFrom stringr str_c
+#' @import dplyr
+#' @import tidyr
 #'
 #' @examples
 #' mydata <- data.frame(P=c(1,1,1,2,2,2), O=c(1,2,3,1,2,3), Y=c(2,2.1,2.2,1.9,2.3,1.8))
+#' balanced_with_interaction(mydata, part=P, operator=O, measurement=Y, alpha=0.01)
 balanced_with_interaction <- function(data, part=P, operator=O,
                                       measurement=Y, alpha=0.05,
                                       conf_type = "mls") {
 
-  #This can be a combination of the conf_intervals and the conf_intervals_gpq
-
   # the model Y_{ijk} = mu_Y + P_i + O_j + (PO)_{ij} + E_{ijk}
 
-
-  # runs all the functions and should create some sort of output
-  # not sure what this would look like
-  mean_ss(data, part, operator,measurement)
+  #if statement for the different types of confidence intervals
   if (conf_type == "mls"){
-    conf_intervals(data, part, operator, measurement, alpha)
-  }else{
-    conf_intervals_gpq(data,part, operator, measurement, alpha)
+    table <- conf_intervals(data, part, operator, measurement, alpha)
+  }else if(conf_type == "gpq"){
+    table <- conf_intervals_gpq(data,part, operator, measurement, alpha)
   }
 
-  gauge_variance_per(data,  part,  operator,  measurement)
-  gauge_variance(data,  part,  operator,  measurement)
-
-  return(stringr::str_c("plot", data))
-
-
-  # output will be a tibble with quantity, estimate, lower, and upper columns.
-
-
-
+  # returning the output of the function with the estimates and the CIs
+  return(table)
 }

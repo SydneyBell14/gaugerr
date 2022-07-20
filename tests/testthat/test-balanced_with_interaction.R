@@ -86,8 +86,27 @@ test_that("balanced_with_interaction works", {
                           0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
   expect_error(balanced_with_interaction(3))
-  expect_error(balanced_with_interaction(data1))
-  expect_equal(balanced_with_interaction(data1))
+  expect_equal(balanced_with_interaction(data1, conf_type = "gpq"), data.frame(
+    quantity = c("s2_repeat", "s2_p", "s2_o", "s2_po", "s2_tot", "s2_repro", "s2_gauge",
+                 "pg_ratio", "gt_ratio", "pr_ratio"),
+    estimate = c(0.51111111, 48.29259259, 0.56460905, 0.72798354, 50.09629630,
+                 1.29259259, 1.80370370, 26.77412731, 0.03600473, 94.48550725),
+    lower = c(0.36774552, 22.75457350, 0.07026645, 0.32937428, 25.54511697,
+              0.66902879, 1.18854234, 1.72011064, 0.01171896, 40.25487071),
+    upper = c(0.7567515, 161.5903712, 26.3940925, 1.7876163, 178.9225770, 27.1642978,
+              27.6687527, 84.3317869, 0.3676321, 326.5864697)
+  ), tolerance = 1e1)
+  expect_equal(balanced_with_interaction(data1), data.frame(
+    quantity = c("repeat", "part", "operator", "part operator interaction",
+                 "total", "s2_repro", "gauge", "pg_ratio", "tg_ratio",
+                 "pr_ratio"),
+    estimate = c(0.51111111, 48.29259259, 0.56460905, 0.72798354, 50.09629630,
+                 1.29259259, 1.80370370, 242.46132786, 0.03600473, 94.48550725),
+    lower = c(0.368157535, 22.694519080, 0.072961525, 0.332725386, 24.488435035,
+              0.612491664, 1.206225574, 1.691679513, 0.009380075, 40.191991368),
+    upper = c(0.7575430, 161.6391842, 25.7507696, 1.7927202, 166.2206934,
+              26.4986366, 27.0172388, 105.6089534, 0.3715153, 327.3236992)
+  ))
 
 
   #this is producing an error, need to spend more attention on it.

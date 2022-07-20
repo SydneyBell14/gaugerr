@@ -29,7 +29,8 @@ object collected}
 \item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
 would have alpha=0.05)}
 
-\item{conf_type}{specifying the type of confidence interval wanted to calculation}
+\item{conf_type}{specifying the type of confidence interval wanted to calculation,
+and there are two options ("mls" or "gpq")}
 }
 \value{
 returns a data frame with the confidence intervals of the data that is
@@ -40,4 +41,6 @@ Balanced With Interaction Analysis
 }
 \examples{
 mydata <- data.frame(P=c(1,1,1,2,2,2), O=c(1,2,3,1,2,3), Y=c(2,2.1,2.2,1.9,2.3,1.8))
+balanced_with_interaction(mydata, part=P, operator=O, measurement=Y, alpha=0.01)
+balanced_with_interaction(mydata, conf_type = "gpq")
 }

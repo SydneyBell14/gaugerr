@@ -10,7 +10,8 @@
 #' object collected
 #' @param alpha the value for the confidence interval calculation (i.e. 95% CI
 #' would have alpha=0.05)
-#' @param conf_type specifying the type of confidence interval wanted to calculation
+#' @param conf_type specifying the type of confidence interval wanted to calculation,
+#' and there are two options ("mls" or "gpq")
 #'
 #' @return returns a data frame with the confidence intervals of the data that is
 #' passed into the function
@@ -18,10 +19,12 @@
 #'
 #' @import dplyr
 #' @import tidyr
+#' @import rlang
 #'
 #' @examples
 #' mydata <- data.frame(P=c(1,1,1,2,2,2), O=c(1,2,3,1,2,3), Y=c(2,2.1,2.2,1.9,2.3,1.8))
 #' balanced_with_interaction(mydata, part=P, operator=O, measurement=Y, alpha=0.01)
+#' balanced_with_interaction(mydata, conf_type = "gpq")
 balanced_with_interaction <- function(data, part=P, operator=O,
                                       measurement=Y, alpha=0.05,
                                       conf_type = "mls") {
@@ -35,12 +38,10 @@ balanced_with_interaction <- function(data, part=P, operator=O,
   #if statement for the different types of confidence intervals
   if (conf_type == "mls"){
     table <- conf_intervals(data, !!part_var, !!oper_var, !!y_var, alpha)
+    bal_interact_mls <- structure(table, class = "intervals_table")
   }else if(conf_type == "gpq"){
-<<<<<<< HEAD
-    table <- conf_intervals_gpq(data, part, operator, measurement, alpha)
-=======
     table <- conf_intervals_gpq(data, !!part_var, !!oper_var, !!y_var, alpha)
->>>>>>> 35184bcc763c28cde0e4a20a228f9bc1706258b7
+    bal_interact_gpq <- structure(table, class = "intervals_table")
   }
 
   # returning the output of the function with the estimates and the CIs

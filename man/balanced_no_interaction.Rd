@@ -9,7 +9,8 @@ balanced_no_interaction(
   part = P,
   operator = O,
   measurement = Y,
-  alpha = 0.05
+  alpha = 0.05,
+  conf_type = "mls"
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ object collected}
 
 \item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
 would have alpha=0.05)}
+
+\item{conf_type}{this parameter specifies the confidence interval type that is
+desired by the function and there are two options ("mls" and "gpq")}
 }
 \value{
 a data frame of the values of the point estimates and the upper and

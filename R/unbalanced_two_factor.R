@@ -202,17 +202,19 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
   upper <- c(gamma_p_upper, gamma_m_upper, mu_y_upper, gamma_r_upper)
 
   # cleaning the data for the data frame output using tidyr techniques
-  upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
-                                                     names_to = "estimate", values_to = "upper")%>%
+  upper.bounds <- data.frame(upper) %>%
+    pivot_longer(cols = everything(),names_to = "estimate", values_to = "upper")%>%
     select(2)
-  lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
-                                                     names_to = "estimate", values_to = "lower") %>%
+  lower.bounds <- data.frame(lower) %>%
+    pivot_longer(cols = everything(), names_to = "estimate", values_to = "lower") %>%
     select(2)
-  estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
-                                                          names_to = "measure", values_to = "estimate")%>%
+  estimate.value <- data.frame(estimate) %>%
+    pivot_longer(cols = everything(), names_to = "measure", values_to = "estimate")%>%
     select(2)
 
   #return statement for the data frame with estimate, lower and upper bounds of the CI
-  return(cbind(quantity, estimate.value, lower.bounds, upper.bounds))
+  table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
+  unbal_two_factor <- structure(table, class = "intervals_table")
+  return(table)
 
 }

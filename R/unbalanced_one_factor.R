@@ -146,32 +146,19 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   upper <- c(gamma_p_upper, gamma_m_upper, mu_upper, gamma_r_upper)
 
   # cleaning the data for the data frame output using tidyr techniques
-  upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
-                                                     names_to = "estimate", values_to = "upper")%>%
+  upper.bounds <- data.frame(upper) %>%
+    pivot_longer(cols = everything(), names_to = "estimate", values_to = "upper") %>%
     select(2)
-  lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
-                                                     names_to = "estimate", values_to = "lower") %>%
+  lower.bounds <- data.frame(lower) %>%
+    pivot_longer(cols = everything(), names_to = "estimate", values_to = "lower") %>%
     select(2)
-  estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
-                                                          names_to = "measure", values_to = "estimate")%>%
+  estimate.value <- data.frame(estimate) %>%
+    pivot_longer(cols = everything(), names_to = "measure", values_to = "estimate")%>%
     select(2)
 
-  x <- structure(data.frame(), class = "confidence_intervals")
-
-
-  #oneFactor <- structure(data.frame(quantity = c("part", "gauge", "mu", "gamma_r"),
-                                    #estimate = c(296.9415549, 679.9360059,
-                                    #             49.5000000, 0.4367199),
-                                    #lower = c(99.0921684, 555.7291338, 35.6936117,
-                                    #          0.1391001),
-                                    #upper = c(1165.134973, 851.234652, 63.306388,
-                                    #          1.737608)),
-                         #class = "confidence_intervals")
-  #oneFactor[[4]][[2]]
-  #inherits(x, "confidence_intervals")
+  table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
+  unbal_one_factor <- structure(table, class = "intervals_table")
 
   #return statement for the data frame with estimate, lower and upper bounds of the CI
-  return(cbind(quantity, estimate.value, lower.bounds, upper.bounds))
-
-
+  return(table)
 }

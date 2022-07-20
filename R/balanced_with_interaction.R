@@ -32,7 +32,7 @@ balanced_with_interaction <- function(data, part=P, operator=O,
   if (conf_type == "mls"){
     table <- conf_intervals(data, part, operator, measurement, alpha)
   }else if(conf_type == "gpq"){
-    table <- conf_intervals_gpq(data,part, operator, measurement, alpha)
+    table <- conf_intervals_gpq(data, part, operator, measurement, alpha)
   }
 
   # returning the output of the function with the estimates and the CIs

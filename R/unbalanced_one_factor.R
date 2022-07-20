@@ -156,6 +156,20 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
                                                           names_to = "measure", values_to = "estimate")%>%
     select(2)
 
+  x <- structure(data.frame(), class = "confidence_intervals")
+
+
+  #oneFactor <- structure(data.frame(quantity = c("part", "gauge", "mu", "gamma_r"),
+                                    #estimate = c(296.9415549, 679.9360059,
+                                    #             49.5000000, 0.4367199),
+                                    #lower = c(99.0921684, 555.7291338, 35.6936117,
+                                    #          0.1391001),
+                                    #upper = c(1165.134973, 851.234652, 63.306388,
+                                    #          1.737608)),
+                         #class = "confidence_intervals")
+  #oneFactor[[4]][[2]]
+  #inherits(x, "confidence_intervals")
+
   #return statement for the data frame with estimate, lower and upper bounds of the CI
   return(cbind(quantity, estimate.value, lower.bounds, upper.bounds))
 

@@ -207,7 +207,7 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
     #return statement for the data frame with estimate, lower and upper bounds of the CI
     table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
     bal_no_interact_mls <- structure(table, class = "intervals_table")
-    return(table)
+    print(bal_no_interact_mls)
 
   } else if (conf_type == "gpq"){
     N <- 1e5
@@ -272,7 +272,7 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
     #return statement for the data frame with estimate, lower and upper bounds of the CI
     table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
     bal_no_interact_gpq <- structure(table, class = "intervals_table")
-    return(table)
+    print(bal_no_interact_gpq)
   } else{
     return("please specify the conf_type as 'mls' or 'gpq'")
   }

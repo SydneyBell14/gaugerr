@@ -39,11 +39,12 @@ balanced_with_interaction <- function(data, part=P, operator=O,
   if (conf_type == "mls"){
     table <- conf_intervals(data, !!part_var, !!oper_var, !!y_var, alpha)
     bal_interact_mls <- structure(table, class = "intervals_table")
+    print(bal_interact_mls)
   }else if(conf_type == "gpq"){
     table <- conf_intervals_gpq(data, !!part_var, !!oper_var, !!y_var, alpha)
     bal_interact_gpq <- structure(table, class = "intervals_table")
+    print(bal_interact_gpq)
   }
 
-  # returning the output of the function with the estimates and the CIs
-  return(table)
+
 }

@@ -1,3 +1,3 @@
-plot.intervals_table <- function(df, ) {
+plot.intervals_table <- function(df, ...) {
 
 }

@@ -86,10 +86,16 @@ test_that("balanced_no_interaction works", {
                           0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
   expect_error(balanced_no_interaction(7))
-  expect_equal(balanced_no_interaction(data1), data.frame(
+  expect_equal(balanced_no_interaction(data1), structure(data.frame(
     quantity = c("repeat", "part", "operator", "total", "gauge", "pr_ratio"),
     estimate = c(1.0151, 1441.0541, 1880.5966, 3322.6658, 1881.6117, 1419.6182),
     lower = c( 0.759019, 681.726616, 509.776251, 1755.591276, 510.792004, 622.082051),
     upper = c(1.427511, 4803.081613, 74280.900152, 75800.989157, 74281.916368, 4859.528589)
-  ))
+  ), class = "intervals_table"))
+  expect_equal(balanced_no_interaction(data2, conf_type = "gpq"), structure(data.frame(
+    quantity = c("part","mu","gauge","gamma_r"),
+    estimate = c(0.003977095567, -0.000030585306, 0.013464919109, 0.2953672082671),
+    lower = c(0.00074, 0.00000000, 0.04741, 0.01087),
+    upper = c(0.014204, 0.05768, 0.084712, 0.235213)
+  ), class="intervals_table"), tolerance = 1e1)
 })

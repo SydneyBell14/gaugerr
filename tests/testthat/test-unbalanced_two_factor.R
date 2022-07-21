@@ -87,4 +87,10 @@ test_that("unbalanced_two_factor works", {
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
 
   expect_error(unbalanced_two_factor(4))
+  expect_equal(unbalanced_two_factor(data1), structure(data.frame(
+    quantity = c("part", "gauge", "mu", "gamma_r"),
+    estimate = c(23357.35541838, 60523.82333333, 3.580000e+01, 0.57470448),
+    lower = c(11091.654241961, 44607.039072649, -124.774439948, 0.048863473),
+    upper = c(77658.9527754, 426285.1621202, 196.3744399, 1.3725212)
+  ), class = "intervals_table"))
 })

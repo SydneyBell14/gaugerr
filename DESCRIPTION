@@ -16,7 +16,8 @@ Imports:
   tidyr, 
   dplyr, 
   stringr,
-  rlang
+  rlang, 
+  ggplot2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

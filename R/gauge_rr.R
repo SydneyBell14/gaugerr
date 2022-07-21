@@ -17,8 +17,21 @@
 #'
 #' @examples
 gauge_rr <- function(data, part=P, operator=O, measurement=Y) {
+  part_var <- rlang::enquo(part)
+  oper_var <- rlang::enquo(operator)
+  y_var <- rlang::enquo(measurement)
   # Function to determine if it is balanced
-  is_balanced <- function(data) {
+  is_balanced <- function(data, part, operator) {
+    total <- count(data, part, operator)
+
+    for (i in length(total$n)){
+      if (sum(total$n)/length(total$n) == total$n[i]){
+        result <- TRUE
+      }else{
+        result <- FALSE
+        return(result)
+      }
+    }
     #what determines if it is balanced
   }
   if (is_balanced == TRUE){

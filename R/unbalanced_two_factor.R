@@ -214,7 +214,7 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
 
   #return statement for the data frame with estimate, lower and upper bounds of the CI
   table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
-  unbal_two_factor <- structure(table, class = "intervals_table")
-  print(unbal_two_factor)
+  unbal_two_factor <- structure(table, class = c("intervals_table", "data.frame"))
+  return(unbal_two_factor)
 
 }

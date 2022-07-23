@@ -1,24 +1,23 @@
 #' Plotting Function
 #'
-#' @param df is a data frame object with class type "intervals_table"
+#' @param x is a data frame object with class type "intervals_table"
 #' @param ... other arguments that can be passed into the function
 #'
 #' @return a ggplot of the confidence intervals defined by the table.
-#' @export plot.intervals_table
+#' @export
 #'
 #' @import ggplot2
+#' @method plot intervals_table
 #'
 #' @examples
 #' mydf <- structure(data.frame(quantity = c("part", "operator"),
-#' estimate = c(12, 15), lower = c(3, 5), upper = c(20, 18)), class= "intervals_table")
-#' mydf.plot
-plot.intervals_table <- function(df, ...) {
-  ggplot(data=df, mapping= aes(x= df$quantity, y= df$estimate)) +
-    geom_pointrange(mapping = aes(ymin = df$lower, ymax = df$upper))
+#' estimate = c(12, 15), lower = c(3, 5), upper = c(20, 18)),
+#' class= c("intervals_table", "data.frame"))
+#' plot(mydf)
+plot.intervals_table <- function(x,...) {
 
-  NextMethod("plot")
+  ggplot(data=x, mapping= aes(x=quantity, y= estimate)) +
+    geom_pointrange(mapping = aes(ymin = lower, ymax = upper))
+
 }
 
-plot <- function(df, ...){
-  UseMethod("plot")
-}

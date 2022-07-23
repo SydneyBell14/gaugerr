@@ -92,5 +92,5 @@ test_that("unbalanced_two_factor works", {
     estimate = c(23357.35541838, 60523.82333333, 3.580000e+01, 0.57470448),
     lower = c(11091.654241961, 44607.039072649, -124.774439948, 0.048863473),
     upper = c(77658.9527754, 426285.1621202, 196.3744399, 1.3725212)
-  ), class = "intervals_table"))
+  ), class = c("intervals_table", "data.frame")))
 })

@@ -38,12 +38,12 @@ balanced_with_interaction <- function(data, part=P, operator=O,
   #if statement for the different types of confidence intervals
   if (conf_type == "mls"){
     table <- conf_intervals(data, !!part_var, !!oper_var, !!y_var, alpha)
-    bal_interact_mls <- structure(table, class = "intervals_table")
-    print(bal_interact_mls)
+    bal_interact_mls <- structure(table, class = c("intervals_table", "data.frame"))
+    return(bal_interact_mls)
   }else if(conf_type == "gpq"){
     table <- conf_intervals_gpq(data, !!part_var, !!oper_var, !!y_var, alpha)
-    bal_interact_gpq <- structure(table, class = "intervals_table")
-    print(bal_interact_gpq)
+    bal_interact_gpq <- structure(table, class = c("intervals_table", "data.frame"))
+    return(bal_interact_gpq)
   }
 
 

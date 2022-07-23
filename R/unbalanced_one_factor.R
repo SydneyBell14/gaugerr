@@ -157,7 +157,7 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
     select(2)
 
   table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
-  unbal_one_factor <- structure(table, class = "intervals_table")
+  unbal_one_factor <- structure(table, class = c("intervals_table", "data.frame"))
 
   #return statement for the data frame with estimate, lower and upper bounds of the CI
   return(unbal_one_factor)

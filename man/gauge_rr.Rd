@@ -4,7 +4,7 @@
 \alias{gauge_rr}
 \title{General Gauge R&R Analysis Function}
 \usage{
-gauge_rr(data, part = P, operator = O, measurement = Y)
+gauge_rr(data, part = P, operator = O, measurement = Y, interaction)
 }
 \arguments{
 \item{data}{a data frame that contains measurements, operators and parts
@@ -18,6 +18,9 @@ for the measurements}
 
 \item{measurement}{a column of the data frame that has measurements of the
 object collected}
+
+\item{interaction}{this is a binary parameter where the user can specify if
+there is or is not interaction in the data set.}
 }
 \value{
 a data frame with the confidence and point estimator values, for the
@@ -25,4 +28,8 @@ appropriate analysis (balanced/unbalanced and one factor/two factor.)
 }
 \description{
 General Gauge R&R Analysis Function
+}
+\examples{
+mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
+gauge_rr(mydata)
 }

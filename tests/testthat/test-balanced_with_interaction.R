@@ -95,7 +95,7 @@ test_that("balanced_with_interaction works", {
               0.66902879, 1.18854234, 1.72011064, 0.01171896, 40.25487071),
     upper = c(0.7567515, 161.5903712, 26.3940925, 1.7876163, 178.9225770, 27.1642978,
               27.6687527, 84.3317869, 0.3676321, 326.5864697)
-  ), class="intervals_table"), tolerance = 1e1)
+  ), class=c("intervals_table", "data.frame")), tolerance = 1e1)
   expect_equal(balanced_with_interaction(data1), structure(data.frame(
     quantity = c("repeat", "part", "operator", "part operator interaction",
                  "total", "s2_repro", "gauge", "pg_ratio", "tg_ratio",
@@ -106,5 +106,5 @@ test_that("balanced_with_interaction works", {
               0.612491664, 1.206225574, 1.691679513, 0.009380075, 40.191991368),
     upper = c(0.7575430, 161.6391842, 25.7507696, 1.7927202, 166.2206934,
               26.4986366, 27.0172388, 105.6089534, 0.3715153, 327.3236992)
-  ), class = "intervals_table"))
+  ), class = c("intervals_table", "data.frame")))
 })

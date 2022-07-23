@@ -4,10 +4,10 @@
 \alias{plot.intervals_table}
 \title{Plotting Function}
 \usage{
-\method{plot}{intervals_table}(df, ...)
+\method{plot}{intervals_table}(x, ...)
 }
 \arguments{
-\item{df}{is a data frame object with class type "intervals_table"}
+\item{x}{is a data frame object with class type "intervals_table"}
 
 \item{...}{other arguments that can be passed into the function}
 }
@@ -19,6 +19,7 @@ Plotting Function
 }
 \examples{
 mydf <- structure(data.frame(quantity = c("part", "operator"),
-estimate = c(12, 15), lower = c(3, 5), upper = c(20, 18)), class= "intervals_table")
-mydf.plot
+estimate = c(12, 15), lower = c(3, 5), upper = c(20, 18)),
+class= c("intervals_table", "data.frame"))
+plot(mydf)
 }

@@ -91,5 +91,5 @@ test_that("unbalanced_one_factor works", {
     estimate = c(296.9415549, 679.9360059, 49.5000000, 0.4367199),
     lower = c(99.0921684, 555.7291338, 35.6936117, 0.1391001),
     upper = c(1165.134973, 851.234652, 63.306388, 1.737608)
-  ), class="intervals_table"))
+  ), class=c("intervals_table", "data.frame")))
 })

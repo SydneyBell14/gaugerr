@@ -8,7 +8,8 @@
 [![R-CMD-check](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of gaugerr is to …
+The goal of gaugerr is to run Gauge R&R analysis on data sets provided
+by the user of the package.
 
 ## Installation
 

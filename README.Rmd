@@ -19,7 +19,11 @@ knitr::opts_chunk$set(
   [![R-CMD-check](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
 
+<<<<<<< HEAD
 The goal of the gaugerr package is to use common models to implement gauge R&R analysis in the tidymodels framework. This package also provides a unified and familiar interface for analysts.  
+=======
+The goal of the gaugerr package is to use common models to implement gauge R&R analysis in the tidymodels framework. This package also provides a unified and familiar interface for analysts.
+>>>>>>> e8a4ba87be71ec1b1798798d10ae846c007430fb
 
 ## Installation
 

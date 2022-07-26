@@ -4,7 +4,16 @@
 \alias{gauge_rr}
 \title{General Gauge R&R Analysis Function}
 \usage{
-gauge_rr(data, part = P, operator = O, measurement = Y, interaction)
+gauge_rr(
+  data,
+  part = P,
+  operator = O,
+  measurement = Y,
+  interaction = FALSE,
+  factor1 = NULL,
+  factor2 = NULL,
+  formula = NULL
+)
 }
 \arguments{
 \item{data}{a data frame that contains measurements, operators and parts
@@ -20,16 +29,25 @@ for the measurements}
 object collected}
 
 \item{interaction}{this is a binary parameter where the user can specify if
-there is or is not interaction in the data set.}
+there is or is not interaction in the data set. (using T/F or TRUE/FALSE)}
+
+\item{factor1}{this tells the function that there is a factor in the data set}
+
+\item{factor2}{this tells the function that there are multiple factors in the
+data set.}
+
+\item{formula}{the user is able to input a formula that determines how many
+factors the model has.}
 }
 \value{
 a data frame with the confidence and point estimator values, for the
-appropriate analysis (balanced/unbalanced and one factor/two factor.)
+appropriate analysis (balanced/unbalanced, one factor/two factor, and
+interaction/no interaction)
 }
 \description{
 General Gauge R&R Analysis Function
 }
 \examples{
 mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
-gauge_rr(mydata)
+gauge_rr(mydata, P, O, Y, interaction=FALSE, factor1=mydata$P, factor2=mydata$O)
 }

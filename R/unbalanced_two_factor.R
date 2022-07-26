@@ -152,7 +152,7 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
     C <- sqrt(stats::qf(1-alpha, 1, (p-1)*(o-1)))
   }
 
-  gamma_p <- (s_p_star - s_po_star)/(o*r_h)
+  gamma_p <- pmax(0,(s_p_star - s_po_star)/(o*r_h))
   v_lp <- G1^2 * s_p_star^2 + H3^2 * s_po_star^2 + G13 * s_p_star * s_po_star
   v_up <- H1^2 * s_p_star^2 + G3^2 * s_po_star^2 + H13 * s_p_star * s_po_star
 
@@ -167,7 +167,7 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
   gamma_r <- ((s_p_star/s_e) - 1)/(r_h)
 
   # interval for mu_y
-  mu_y <- ybar_star
+  mu_y <- pmax(0,ybar_star)
   mu_y_lower <- mu_y - C * sqrt(K)/sqrt(p*o*r_h)
   mu_y_upper <- mu_y + C * sqrt(K)/sqrt(p*o*r_h)
 

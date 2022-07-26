@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
   [![R-CMD-check](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
 
-The goal of gaugerr is to run Gauge R&R analysis on data sets provided by the user of the package. 
+The goal of the gaugerr package is to use common models to implement gauge R&R analysis in the tidymodels framework. This package also provides a unified and familiar interface for analysts.  
 
 ## Installation
 
@@ -32,11 +32,26 @@ devtools::install_github("aloy/gaugerr")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is an example which shows you how to use the gauge_rr function that runs the general analysis:
+
+```{r, include=FALSE}
+data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,
+                          4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,
+                          7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,
+                          10,10,10,10,10,10,10,10,10),
+                      Y=c(37,38,37,41,41,40,41,42,41,42,41,43,42,42,42,43,42,43,
+                          30,31,31,31,31,31,29,30,28,42,43,42,43,43,43,42,42,42,
+                          28,30,29,29,30,29,31,29,29,42,42,43,45,45,45,44,46,45,
+                          25,26,27,28,28,30,29,27,27,40,40,40,43,42,42,43,43,41,
+                          25,25,25,27,29,28,26,26,26,35,34,34,35,35,34,35,34,35),
+                      O=c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,
+                          1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,
+                          1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,                      1,1,1,2,2,2,3,3,3))
+```
 
 ```{r example}
 library(gaugerr)
-## basic example code
+gauge_rr(data1, P, O, Y, interaction=FALSE)
 ```
 
 What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:

@@ -35,9 +35,9 @@ gauge_rr <- function(data, part=P, operator=O, measurement=Y,
   # Function to determine if it is balanced
   if (is_balanced(data, !!part_var, !!oper_var) == TRUE){
     if(is_interaction(interaction) == TRUE){
-      print("balanced_with_interaction")
+      balanced_with_interaction(data, !!part_var, !!oper_var)
     }else if (is_interaction(interaction) == FALSE){
-      print("balanced_no_interaction")
+      balanced_no_interaction(data, !!part_var , !!oper_var)
     }
   }else{
     if(is.null(formula)){

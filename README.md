@@ -8,8 +8,9 @@
 [![R-CMD-check](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of gaugerr is to run Gauge R&R analysis on data sets provided
-by the user of the package.
+The goal of the gaugerr package is to use common models to implement
+gauge R&R analysis in the tidymodels framework. This package also
+provides a unified and familiar interface for analysts.
 
 ## Installation
 
@@ -23,11 +24,13 @@ devtools::install_github("aloy/gaugerr")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is an example which shows you how to use the gauge_rr function that
+runs the general analysis:
 
 ``` r
 library(gaugerr)
-## basic example code
+gauge_rr(data1, P, O, Y, interaction=FALSE)
+#> [1] "balanced_no_interaction"
 ```
 
 What is special about using `README.Rmd` instead of just `README.md`?

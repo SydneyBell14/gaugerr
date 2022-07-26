@@ -19,38 +19,38 @@ knitr::opts_chunk$set(
   [![R-CMD-check](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
 
-<<<<<<< HEAD
-The goal of the gaugerr package is to use common models to implement gauge R&R analysis in the tidymodels framework. This package also provides a unified and familiar interface for analysts.  
-=======
-The goal of the gaugerr package is to use common models to implement gauge R&R analysis in the tidymodels framework. This package also provides a unified and familiar interface for analysts.
->>>>>>> e8a4ba87be71ec1b1798798d10ae846c007430fb
+## Overview
+
+gaugerr is a package that uses common models to implement Gauge R&R analysis. This package was developed in the tidymodels framework. The user provides the data for the analysis and the choses the function to determine the type of input desired. 
 
 ## Installation
 
-You can install the development version of gaugerr from [GitHub](https://github.com/) with:
+You can install the development version of gaugerr using the code below:
 
-``` r
-# install.packages("devtools")
+```{r, eval=FALSE}
+install.packages("devtools")
 devtools::install_github("aloy/gaugerr")
 ```
 
-## Example
+## Usage
 
-This is an example which shows you how to use the gauge_rr function that runs the general analysis:
+There are several ways to use this package as it has different functions depending on the calculations of interest. One highlight function of the package is `gauge_rr()`. When a data set and specific parameters (part, operator, measurement, interaction, factor1 and factor2) are passed into the function, and it decides the type of analysis needed given the information. 
 
 ```{r, include=FALSE}
-data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,
-                          4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,
-                          7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,
-                          10,10,10,10,10,10,10,10,10),
-                      Y=c(37,38,37,41,41,40,41,42,41,42,41,43,42,42,42,43,42,43,
-                          30,31,31,31,31,31,29,30,28,42,43,42,43,43,43,42,42,42,
-                          28,30,29,29,30,29,31,29,29,42,42,43,45,45,45,44,46,45,
-                          25,26,27,28,28,30,29,27,27,40,40,40,43,42,42,43,43,41,
-                          25,25,25,27,29,28,26,26,26,35,34,34,35,35,34,35,34,35),
-                      O=c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,
-                          1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,
-                          1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,                      1,1,1,2,2,2,3,3,3))
+data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,
+                  3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,
+                  6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,
+                  9,9,9,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10),
+                  Y=c(37,38,37,41,41,40,41,42,41,42,41,43,42,42,42, 
+                  43,42,43,30,31,31,31,31,31,29,30,28,42,43,42,43,
+                  43,43,42,42,42,28,30,29,29,30,29,31,29,29,42,42,
+                  43,45,45,45,44,46,45,25,26,27,28,28,30,29,27,27,
+                  40,40,40,43,42,42,43,43,41,25,25,25,27,29,28,26,
+                  26,26,35,34,34,35,35,34,35,34,35),
+                O=c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,
+                  2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,
+                  2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,
+                  1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3))
 ```
 
 ```{r example}
@@ -58,18 +58,15 @@ library(gaugerr)
 gauge_rr(data1, P, O, Y, interaction=FALSE)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+The table above gives information about the point estimator of the quantity and the upper and lower bounds for the confidence intervals. This function will always return an object with these same columns and the object can be plotted to show these values visually.  
 
-```{r cars}
-summary(cars)
+The figure below plots the information from the table of values. The points are the values of point estimators and the line segments show the range for the upper and lower bounds of the confidence interval.
+
+```{r plot, echo=FALSE}
+table <- gauge_rr(data1, P, O, Y, interaction=FALSE)
+plot(table)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/v1/examples>.
+## Learning 
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+This package is intended to be very user friendly for individuals wanting to run Gauge R&R analysis. There are specific functions for particular calculations of interest and there are general functions that provide more of an overview. 

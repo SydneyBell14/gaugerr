@@ -8,54 +8,57 @@
 [![R-CMD-check](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aloy/gaugerr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of the gaugerr package is to use common models to implement
-gauge R&R analysis in the tidymodels framework. This package also
-provides a unified and familiar interface for analysts.
+## Overview
+
+gaugerr is a package that uses common models to implement Gauge R&R
+analysis. This package was developed in the tidymodels framework. The
+user provides the data for the analysis and the choses the function to
+determine the type of input desired.
 
 ## Installation
 
-You can install the development version of gaugerr from
-[GitHub](https://github.com/) with:
+You can install the development version of gaugerr using the code below:
 
 ``` r
-# install.packages("devtools")
+install.packages("devtools")
 devtools::install_github("aloy/gaugerr")
 ```
 
-## Example
+## Usage
 
-This is an example which shows you how to use the gauge_rr function that
-runs the general analysis:
+There are several ways to use this package as it has different functions
+depending on the calculations of interest. One highlight function of the
+package is `gauge_rr()`. When a data set and specific parameters (part,
+operator, measurement, interaction, factor1 and factor2) are passed into
+the function, and it decides the type of analysis needed given the
+information.
 
 ``` r
 library(gaugerr)
 gauge_rr(data1, P, O, Y, interaction=FALSE)
-#> [1] "balanced_no_interaction"
+#>   quantity  estimate       lower        upper
+#> 1   repeat    1.0151    0.759019     1.427511
+#> 2     part 1441.0541  681.726616  4803.081613
+#> 3 operator 1880.5966  509.776251 74280.900152
+#> 4    total 3322.6658 1755.591276 75800.989157
+#> 5    gauge 1881.6117  510.792004 74281.916368
+#> 6 pr_ratio 1419.6182  622.082051  4859.528589
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+The table above gives information about the point estimator of the
+quantity and the upper and lower bounds for the confidence intervals.
+This function will always return an object with these same columns and
+the object can be plotted to show these values visually.
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+The figure below plots the information from the table of values. The
+points are the values of point estimators and the line segments show the
+range for the upper and lower bounds of the confidence interval.
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
+<img src="man/figures/README-plot-1.png" width="100%" />
 
-You can also embed plots, for example:
+## Learning
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+This package is intended to be very user friendly for individuals
+wanting to run Gauge R&R analysis. There are specific functions for
+particular calculations of interest and there are general functions that
+provide more of an overview.

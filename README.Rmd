@@ -62,7 +62,7 @@ The table above gives information about the point estimator of the quantity and 
 
 The figure below plots the information from the table of values. The points are the values of point estimators and the line segments show the range for the upper and lower bounds of the confidence interval.
 
-```{r plot, echo=FALSE}
+```{r plot}
 table <- gauge_rr(data1, P, O, Y, interaction=FALSE)
 plot(table)
 ```

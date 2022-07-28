@@ -26,46 +26,46 @@
 conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05, N=1e5) {
   #calculations for n, p, o, r based on the data frame
   n <- nrow(data)
-  p <- nrow(data %>%
-              group_by({{part}}) %>%
+  p <- nrow(data |>
+              group_by({{part}}) |>
               summarize(ybar = mean({{measurement}})))
-  o <- nrow(data %>%
-              group_by({{operator}}) %>%
+  o <- nrow(data |>
+              group_by({{operator}}) |>
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
 
   #SSP: sum of squares for parts
-  SSP <- data %>%
-    group_by({{part}})%>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) %>%
-    distinct() %>%
-    summarize(SSP = sum(.data$ssP1)* r * o) %>%
+  SSP <- data |>
+    group_by({{part}})|>
+    mutate(ybarI = mean({{measurement}})) |>
+    ungroup() |>
+    mutate(ybar = mean({{measurement}})) |>
+    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) |>
+    distinct() |>
+    summarize(SSP = sum(.data$ssP1)* r * o) |>
     pull()
   #SSO: sum of squares for operator
-  SSO <- data %>%
-    group_by({{operator}}) %>%
-    mutate(ybarJ = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
-    distinct() %>%
-    summarize(SSO = sum(.data$ssP1)* r * p) %>%
+  SSO <- data |>
+    group_by({{operator}}) |>
+    mutate(ybarJ = mean({{measurement}})) |>
+    ungroup() |>
+    mutate(ybar = mean({{measurement}})) |>
+    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) |>
+    distinct() |>
+    summarize(SSO = sum(.data$ssP1)* r * p) |>
     pull()
   #SSE: sum of squares for equipment (part/operator interaction)
-  SSE <- data%>%
-    group_by({{operator}}, {{part}}) %>%
-    mutate(ybar2 = mean({{measurement}})) %>%
-    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
-    ungroup()%>%
-    summarize(SSE=sum(.data$SSe)) %>%
+  SSE <- data|>
+    group_by({{operator}}, {{part}}) |>
+    mutate(ybar2 = mean({{measurement}})) |>
+    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) |>
+    ungroup()|>
+    summarize(SSE=sum(.data$SSe)) |>
     pull() # end SSE
   #SST: the total variance for sum of squares
-  SST<- data%>%
-    summarize(varT = stats::var({{measurement}}))%>%
-    summarize(MSPO = .data$varT*(n-1)) %>%
+  SST<- data|>
+    summarize(varT = stats::var({{measurement}}))|>
+    summarize(MSPO = .data$varT*(n-1)) |>
     pull() # end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST - sum(SSP, SSO, SSE)
@@ -136,8 +136,8 @@ conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 
                 "s2_repro", "s2_gauge", "pg_ratio","gt_ratio", "pr_ratio")
   estimate <- c(s_e, s2_p, s2_o, s2_po, s2_tot,  s2_repro, s2_gauge,
                 pg_ratio, gt_ratio, pr_ratio)
-  estimators <- data.frame(estimate) %>% pivot_longer(cols = everything(),
-                names_to = "name", values_to = "estimate") %>% select(2)
+  estimators <- data.frame(estimate) |> pivot_longer(cols = everything(),
+                names_to = "name", values_to = "estimate") |> select(2)
   est.quant <- data.frame(quantity, estimators)
   limits <- bind_rows(stats::quantile(gpq_repeat, probs, na.rm = TRUE),
                       stats::quantile(gpq_part, probs, na.rm = TRUE),

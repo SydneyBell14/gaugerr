@@ -27,62 +27,62 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
 
   #calculations for the constants n,p,o and r that depend on the data frame
   n <- nrow(data)
-  p <- nrow(data %>%
-              group_by({{part}}) %>%
+  p <- nrow(data |>
+              group_by({{part}}) |>
               summarize(ybar = mean({{measurement}})))
-  o <- nrow(data %>%
-              group_by({{operator}}) %>%
+  o <- nrow(data |>
+              group_by({{operator}}) |>
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
 
   #ybar calculations
-  ybar <- data %>%
-    summarize(ybar_star = (mean({{measurement}}))/(p*o*r)) %>%
+  ybar <- data |>
+    summarize(ybar_star = (mean({{measurement}}))/(p*o*r)) |>
     pull()
 
-  ybarI <- data %>%
-    group_by({{part}}) %>%
-    summarise(sum = sum({{measurement}})) %>%
+  ybarI <- data |>
+    group_by({{part}}) |>
+    summarise(sum = sum({{measurement}})) |>
     summarise(ybarI = (.data$sum)/(o*r))
 
-  ybarJ <- data %>%
-    group_by({{operator}}) %>%
-    summarise(sum = sum({{measurement}})) %>%
+  ybarJ <- data |>
+    group_by({{operator}}) |>
+    summarise(sum = sum({{measurement}})) |>
     summarise(ybarJ = (.data$sum)/(p*r))
 
-  ybarIJ <- data %>%
-    group_by({{part}}, {{operator}}) %>%
-    summarize(sum = sum({{measurement}})) %>%
+  ybarIJ <- data |>
+    group_by({{part}}, {{operator}}) |>
+    summarize(sum = sum({{measurement}})) |>
     summarise(ybarIJ = (.data$sum)/(r))
 
   #s_p calculation
-  s_p <- data %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    group_by({{part}}) %>%
-    summarise(ybarI = mean({{measurement}})) %>%
-    ungroup()%>%
-    summarise((o*r*sum((ybarI-ybar)^2))/(p-1)) %>%
+  s_p <- data |>
+    mutate(ybar = mean({{measurement}})) |>
+    group_by({{part}}) |>
+    summarise(ybarI = mean({{measurement}})) |>
+    ungroup()|>
+    summarise((o*r*sum((ybarI-ybar)^2))/(p-1)) |>
     pull()
 
   #s_o calculation
-  s_o <- data %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    group_by({{operator}}) %>%
-    summarise(ybarJ = mean({{measurement}})) %>%
-    ungroup()%>%
-    summarise((p*r*sum((ybarJ - ybar)^2))/(o-1)) %>%
+  s_o <- data |>
+    mutate(ybar = mean({{measurement}})) |>
+    group_by({{operator}}) |>
+    summarise(ybarJ = mean({{measurement}})) |>
+    ungroup()|>
+    summarise((p*r*sum((ybarJ - ybar)^2))/(o-1)) |>
     pull()
 
   #s_e calculation
-  s_e <- data %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    group_by({{part}}) %>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    group_by({{operator}}) %>%
-    mutate(ybarJ = mean({{measurement}})) %>%
-    ungroup() %>%
-    summarise((sum(({{measurement}} - ybarI - ybarJ + ybar)^2))/(p*o*r - p - o + 1)) %>%
+  s_e <- data |>
+    mutate(ybar = mean({{measurement}})) |>
+    group_by({{part}}) |>
+    mutate(ybarI = mean({{measurement}})) |>
+    ungroup() |>
+    group_by({{operator}}) |>
+    mutate(ybarJ = mean({{measurement}})) |>
+    ungroup() |>
+    summarise((sum(({{measurement}} - ybarI - ybarJ + ybar)^2))/(p*o*r - p - o + 1)) |>
     pull()
 
   if(conf_type == "mls"){
@@ -194,14 +194,14 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
                gamma_m_upper, sigma_pe_upper)
 
     # cleaning the data for the data frame output using tidyr techniques
-    upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
-                                                       names_to = "estimate", values_to = "upper")%>%
+    upper.bounds <- data.frame(upper) |> pivot_longer(cols = everything(),
+                                                       names_to = "estimate", values_to = "upper")|>
       select(2)
-    lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
-                                                       names_to = "estimate", values_to = "lower") %>%
+    lower.bounds <- data.frame(lower) |> pivot_longer(cols = everything(),
+                                                       names_to = "estimate", values_to = "lower") |>
       select(2)
-    estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
-                                                            names_to = "measure", values_to = "estimate")%>%
+    estimate.value <- data.frame(estimate) |> pivot_longer(cols = everything(),
+                                                            names_to = "measure", values_to = "estimate")|>
       select(2)
 
     #return statement for the data frame with estimate, lower and upper bounds of the CI
@@ -259,14 +259,14 @@ balanced_no_interaction <- function(data, part=P, operator=O, measurement=Y, alp
     upper <- c(gamma_p_upper, mu_y_upper, gamma_m_upper, gamma_r_upper)
 
     # cleaning the data for the data frame output using tidyr techniques
-    upper.bounds <- data.frame(upper) %>%
-      pivot_longer(cols = everything(), names_to = "estimate", values_to = "upper")%>%
+    upper.bounds <- data.frame(upper) |>
+      pivot_longer(cols = everything(), names_to = "estimate", values_to = "upper")|>
       select(2)
-    lower.bounds <- data.frame(lower) %>%
-      pivot_longer(cols = everything(), names_to = "estimate", values_to = "lower") %>%
+    lower.bounds <- data.frame(lower) |>
+      pivot_longer(cols = everything(), names_to = "estimate", values_to = "lower") |>
       select(2)
-    estimate.value <- data.frame(estimate) %>%
-      pivot_longer(cols = everything(), names_to = "measure", values_to = "estimate")%>%
+    estimate.value <- data.frame(estimate) |>
+      pivot_longer(cols = everything(), names_to = "measure", values_to = "estimate")|>
       select(2)
 
     #return statement for the data frame with estimate, lower and upper bounds of the CI

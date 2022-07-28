@@ -25,46 +25,46 @@
 conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05) {
   #calculations for the constants n,p,o and r that depend on the data frame
   n <- nrow(data)
-  p <- nrow(data %>%
-              group_by({{part}}) %>%
+  p <- nrow(data |>
+              group_by({{part}}) |>
               summarize(ybar = mean({{measurement}})))
-  o <- nrow(data %>%
-              group_by({{operator}}) %>%
+  o <- nrow(data |>
+              group_by({{operator}}) |>
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p)
 
   #SSP: sum of squares for parts
-  SSP <- data %>%
-    group_by({{part}})%>%
-    mutate(ybarI = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) %>%
-    distinct() %>%
-    summarize(SSP = sum(.data$ssP1)* r * o) %>%
+  SSP <- data |>
+    group_by({{part}})|>
+    mutate(ybarI = mean({{measurement}})) |>
+    ungroup() |>
+    mutate(ybar = mean({{measurement}})) |>
+    summarize(ssP1 = (.data$ybarI-.data$ybar)^2) |>
+    distinct() |>
+    summarize(SSP = sum(.data$ssP1)* r * o) |>
     pull()
   #SSO: sum of squares for operator
-  SSO <- data %>%
-    group_by({{operator}}) %>%
-    mutate(ybarJ = mean({{measurement}})) %>%
-    ungroup() %>%
-    mutate(ybar = mean({{measurement}})) %>%
-    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) %>%
-    distinct() %>%
-    summarize(SSO = sum(.data$ssP1)* r * p) %>%
+  SSO <- data |>
+    group_by({{operator}}) |>
+    mutate(ybarJ = mean({{measurement}})) |>
+    ungroup() |>
+    mutate(ybar = mean({{measurement}})) |>
+    summarize(ssP1 = (.data$ybarJ-.data$ybar)^2) |>
+    distinct() |>
+    summarize(SSO = sum(.data$ssP1)* r * p) |>
     pull()
   #SSE: sum of squares for equipment (part/operator interaction)
-  SSE <- data%>%
-    group_by({{operator}}, {{part}}) %>%
-    mutate(ybar2 = mean({{measurement}})) %>%
-    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) %>%
-    ungroup()%>%
-    summarize(SSE=sum(.data$SSe)) %>%
+  SSE <- data|>
+    group_by({{operator}}, {{part}}) |>
+    mutate(ybar2 = mean({{measurement}})) |>
+    summarize(SSe = sum((.data$ybar2-{{measurement}})^2)) |>
+    ungroup()|>
+    summarize(SSE=sum(.data$SSe)) |>
     pull() # end SSE
   #SST: the total variance for sum of squares
-  SST<- data%>%
-    summarize(varT = stats::var({{measurement}}))%>%
-    summarize(SST = .data$varT*(n-1)) %>%
+  SST<- data|>
+    summarize(varT = stats::var({{measurement}}))|>
+    summarize(SST = .data$varT*(n-1)) |>
     pull()# end SST
   #SSPO: total - sum of the sum of squares for part, operator and equipment (part/operator interaction)
   SSPO <- SST-sum(SSP, SSO, SSE)
@@ -88,8 +88,8 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
   #pr_ratio <- pmax(0,s2_p/s_e)
 
   #calculation for the point estimates from book
-  mu_y <- data %>%
-    summarize(ybar = mean({{measurement}})) %>%
+  mu_y <- data |>
+    summarize(ybar = mean({{measurement}})) |>
     pull()
   gamma_p <- pmax(0,(s_p - s_po)/(o*r))
 
@@ -233,14 +233,14 @@ conf_intervals <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05
                repro.upper, gamma_m_upper,pg_ratio_upper, 1/tg_ratio_lower, sigmaP_sigmaE_upper)
 
   # cleaning the data for the data frame output using tidyr techniques
-  upper.bounds <- data.frame(upper) %>% pivot_longer(cols = everything(),
-                                                       names_to = "estimate", values_to = "upper")%>%
+  upper.bounds <- data.frame(upper) |> pivot_longer(cols = everything(),
+                                                       names_to = "estimate", values_to = "upper")|>
       select(2)
-  lower.bounds <- data.frame(lower) %>% pivot_longer(cols = everything(),
-                                                     names_to = "estimate", values_to = "lower") %>%
+  lower.bounds <- data.frame(lower) |> pivot_longer(cols = everything(),
+                                                     names_to = "estimate", values_to = "lower") |>
       select(2)
-  estimate.value <- data.frame(estimate) %>% pivot_longer(cols = everything(),
-                                                            names_to = "measure", values_to = "estimate")%>%
+  estimate.value <- data.frame(estimate) |> pivot_longer(cols = everything(),
+                                                            names_to = "measure", values_to = "estimate")|>
     select(2)
 
   #return statement for the data frame with estimate, lower and upper bounds of the CI

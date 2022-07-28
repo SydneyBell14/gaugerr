@@ -54,6 +54,11 @@ The figure below plots the information from the table of values. The
 points are the values of point estimators and the line segments show the
 range for the upper and lower bounds of the confidence interval.
 
+``` r
+table <- gauge_rr(data1, P, O, Y, interaction=FALSE)
+plot(table)
+```
+
 <img src="man/figures/README-plot-1.png" width="100%" />
 
 ## Learning

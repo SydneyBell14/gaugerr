@@ -27,34 +27,34 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
 
   #calculation for n, p, o, and r
   n <- nrow(data)
-  p <- nrow(data %>%
-              group_by({{part}}) %>%
+  p <- nrow(data |>
+              group_by({{part}}) |>
               summarize(ybar = mean({{measurement}})))
-  o <- nrow(data %>%
-              group_by({{operator}}) %>%
+  o <- nrow(data |>
+              group_by({{operator}}) |>
               summarize(ybar = mean({{measurement}})))
   r <- n/(o*p) # change to r_h
-  N <- data %>%
-    group_by({{part}}) %>%
-    summarize(N = sum({{operator}})) %>%
-    ungroup() %>%
-    distinct() %>%
-    summarize(N = sum(N)) %>%
+  N <- data |>
+    group_by({{part}}) |>
+    summarize(N = sum({{operator}})) |>
+    ungroup() |>
+    distinct() |>
+    summarize(N = sum(N)) |>
     pull()
-  r_O <- data %>%
-    group_by({{part}}) %>%
-    summarise(summation = sum({{operator}}^2)) %>%
-    ungroup()%>%
-    distinct() %>%
-    summarize(sum = sum(.data$summation)) %>%
-    summarise(r_O = (N-.data$sum/N)/(p-1)) %>%
+  r_O <- data |>
+    group_by({{part}}) |>
+    summarise(summation = sum({{operator}}^2)) |>
+    ungroup()|>
+    distinct() |>
+    summarize(sum = sum(.data$summation)) |>
+    summarise(r_O = (N-.data$sum/N)/(p-1)) |>
     pull()
-  r_h <- data %>%
-    group_by({{part}}) %>%
-    summarize(reps = n()) %>%
-    mutate(frac = 1/.data$reps) %>%
-    ungroup()%>%
-    summarize(r_h = p/(sum(.data$frac))) %>%
+  r_h <- data |>
+    group_by({{part}}) |>
+    summarize(reps = n()) |>
+    mutate(frac = 1/.data$reps) |>
+    ungroup()|>
+    summarize(r_h = p/(sum(.data$frac))) |>
     pull()
 
 
@@ -63,45 +63,45 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
 
 
   #calculation for s_p, s_e, ybarI, ybar, s_p_star, and ybar_star
-  ybarI <- data %>%
-    group_by({{part}}) %>%
-    summarise(ybarI = (sum({{measurement}}))/o) %>%
-    ungroup()%>%
-    distinct() %>%
-    summarize(ybarI = mean(.data$ybarI)) %>%
+  ybarI <- data |>
+    group_by({{part}}) |>
+    summarise(ybarI = (sum({{measurement}}))/o) |>
+    ungroup()|>
+    distinct() |>
+    summarize(ybarI = mean(.data$ybarI)) |>
     pull()
 
-  ybar <- data %>%
-    group_by({{part}}, {{operator}}) %>%
-    summarize(ybar = (sum({{measurement}}))/N) %>%
-    ungroup()%>%
-    distinct() %>%
-    summarize(ybar = mean(.data$ybar)) %>%
+  ybar <- data |>
+    group_by({{part}}, {{operator}}) |>
+    summarize(ybar = (sum({{measurement}}))/N) |>
+    ungroup()|>
+    distinct() |>
+    summarize(ybar = mean(.data$ybar)) |>
     pull()
 
-  s_p <- data %>%
-    group_by({{part}}) %>%
-    summarize(s_p1 = (sum({{operator}})*(ybarI-ybar)^2)/(p-1)) %>%
-    ungroup() %>%
-    summarize(s_p = sum(.data$s_p1)) %>%
+  s_p <- data |>
+    group_by({{part}}) |>
+    summarize(s_p1 = (sum({{operator}})*(ybarI-ybar)^2)/(p-1)) |>
+    ungroup() |>
+    summarize(s_p = sum(.data$s_p1)) |>
     pull()
 
-  s_e <- data %>%
-    group_by({{part}}, {{operator}}) %>%
-    summarize(s_e1 = (sum(({{measurement}}-ybar)^2))/(N-p)) %>%
-    ungroup() %>%
-    summarize(s_e = sum(.data$s_e1)) %>%
+  s_e <- data |>
+    group_by({{part}}, {{operator}}) |>
+    summarize(s_e1 = (sum(({{measurement}}-ybar)^2))/(N-p)) |>
+    ungroup() |>
+    summarize(s_e = sum(.data$s_e1)) |>
     pull()
 
-  ybar_star <- data %>%
-    group_by({{part}}) %>%
-    summarize(ybar_star1 = (sum({{part}}))/p) %>%
-    ungroup() %>%
-    summarize(ybar_star = sum(.data$ybar_star1)) %>%
+  ybar_star <- data |>
+    group_by({{part}}) |>
+    summarize(ybar_star1 = (sum({{part}}))/p) |>
+    ungroup() |>
+    summarize(ybar_star = sum(.data$ybar_star1)) |>
     pull()
 
-  s_p_star <- data %>%
-    summarize(((sum((ybarI - ybar_star)^2))*r_h)/(p-1)) %>%
+  s_p_star <- data |>
+    summarize(((sum((ybarI - ybar_star)^2))*r_h)/(p-1)) |>
     pull()
 
   #constants for the confidence interval calculation
@@ -146,14 +146,14 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   upper <- c(gamma_p_upper, gamma_m_upper, mu_upper, gamma_r_upper)
 
   # cleaning the data for the data frame output using tidyr techniques
-  upper.bounds <- data.frame(upper) %>%
-    pivot_longer(cols = everything(), names_to = "estimate", values_to = "upper") %>%
+  upper.bounds <- data.frame(upper) |>
+    pivot_longer(cols = everything(), names_to = "estimate", values_to = "upper") |>
     select(2)
-  lower.bounds <- data.frame(lower) %>%
-    pivot_longer(cols = everything(), names_to = "estimate", values_to = "lower") %>%
+  lower.bounds <- data.frame(lower) |>
+    pivot_longer(cols = everything(), names_to = "estimate", values_to = "lower") |>
     select(2)
-  estimate.value <- data.frame(estimate) %>%
-    pivot_longer(cols = everything(), names_to = "measure", values_to = "estimate")%>%
+  estimate.value <- data.frame(estimate) |>
+    pivot_longer(cols = everything(), names_to = "measure", values_to = "estimate")|>
     select(2)
 
   table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)

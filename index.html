@@ -87,6 +87,9 @@
 <span><span class="co">#&gt; 6 pr_ratio 1419.6182  622.082051  4859.528589</span></span></code></pre></div>
 <p>The table above gives information about the point estimator of the quantity and the upper and lower bounds for the confidence intervals. This function will always return an object with these same columns and the object can be plotted to show these values visually.</p>
 <p>The figure below plots the information from the table of values. The points are the values of point estimators and the line segments show the range for the upper and lower bounds of the confidence interval.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gauge_rr.html">gauge_rr</a></span><span class="op">(</span><span class="va">data1</span>, <span class="va">P</span>, <span class="va">O</span>, <span class="va">Y</span>, interaction<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">table</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-1.png" width="100%"></p>
 </div>
 <div class="section level2">

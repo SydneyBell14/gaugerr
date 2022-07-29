@@ -19,6 +19,9 @@
     <loc>https://aloy.github.io/gaugerr/reference/balanced_no_interaction.html</loc>
   </url>
   <url>
+    <loc>https://aloy.github.io/gaugerr/reference/balanced_one_factor.html</loc>
+  </url>
+  <url>
     <loc>https://aloy.github.io/gaugerr/reference/balanced_with_interaction.html</loc>
   </url>
   <url>
@@ -49,9 +52,12 @@
     <loc>https://aloy.github.io/gaugerr/reference/point_estimate.html</loc>
   </url>
   <url>
+    <loc>https://aloy.github.io/gaugerr/reference/unbalanced_no_interaction.html</loc>
+  </url>
+  <url>
     <loc>https://aloy.github.io/gaugerr/reference/unbalanced_one_factor.html</loc>
   </url>
   <url>
-    <loc>https://aloy.github.io/gaugerr/reference/unbalanced_two_factor.html</loc>
+    <loc>https://aloy.github.io/gaugerr/reference/unbalanced_with_interaction.html</loc>
   </url>
 </urlset>

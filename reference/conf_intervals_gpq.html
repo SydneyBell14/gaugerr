@@ -96,7 +96,7 @@ bounds of the CI.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">5</span><span class="op">)</span>,O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span><span class="op">)</span>,Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5.3</span>, <span class="fl">6.5</span>, <span class="fl">5.4</span>, <span class="fl">6.4</span>, <span class="fl">6.9</span>, <span class="fl">5.8</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">conf_intervals_gpq</span><span class="op">(</span><span class="va">mydata</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     quantity  estimate     lower    upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat 0.6083333 0.2341832 5.166085</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat 0.6083333 0.2337665 5.221518</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2       s2_p 0.0000000        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3       s2_o       NaN        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4      s2_po       Inf        NA       NA</span>
@@ -107,20 +107,8 @@ bounds of the CI.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9   gt_ratio       NaN        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10  pr_ratio 0.0000000        NA       NA</span>
 <span class="r-in"><span><span class="fu">conf_intervals_gpq</span><span class="op">(</span><span class="va">mydata</span>, N<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     quantity  estimate    lower    upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat 0.6083333 0.194239 8.297933</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       s2_p 0.0000000       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       s2_o       NaN       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      s2_po       Inf       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     s2_tot       NaN       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   s2_repro       NaN       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   s2_gauge       NaN       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   pg_ratio       NaN       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   gt_ratio       NaN       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  pr_ratio 0.0000000       NA       NA</span>
-<span class="r-in"><span><span class="fu">conf_intervals_gpq</span><span class="op">(</span><span class="va">mydata</span>, part<span class="op">=</span><span class="va">P</span>, operator<span class="op">=</span><span class="va">O</span>, measurement<span class="op">=</span><span class="va">Y</span>, alpha<span class="op">=</span><span class="fl">0.01</span>, N<span class="op">=</span><span class="fl">1e4</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     quantity  estimate     lower    upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat 0.6083333 0.1363419 23.20831</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat 0.6083333 0.2133786 8.218128</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2       s2_p 0.0000000        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3       s2_o       NaN        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4      s2_po       Inf        NA       NA</span>
@@ -130,6 +118,18 @@ bounds of the CI.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8   pg_ratio       NaN        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9   gt_ratio       NaN        NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10  pr_ratio 0.0000000        NA       NA</span>
+<span class="r-in"><span><span class="fu">conf_intervals_gpq</span><span class="op">(</span><span class="va">mydata</span>, part<span class="op">=</span><span class="va">P</span>, operator<span class="op">=</span><span class="va">O</span>, measurement<span class="op">=</span><span class="va">Y</span>, alpha<span class="op">=</span><span class="fl">0.01</span>, N<span class="op">=</span><span class="fl">1e4</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     quantity  estimate    lower    upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat 0.6083333 0.142045 24.05849</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       s2_p 0.0000000       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       s2_o       NaN       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      s2_po       Inf       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     s2_tot       NaN       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   s2_repro       NaN       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   s2_gauge       NaN       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   pg_ratio       NaN       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   gt_ratio       NaN       NA       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  pr_ratio 0.0000000       NA       NA</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -9,6 +9,7 @@ gauge_rr(
   part = P,
   operator = O,
   measurement = Y,
+  alpha = 0.05,
   interaction = FALSE,
   factor1 = NULL,
   factor2 = NULL,
@@ -27,6 +28,9 @@ for the measurements}
 
 \item{measurement}{a column of the data frame that has measurements of the
 object collected}
+
+\item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
+would have alpha=0.05)}
 
 \item{interaction}{this is a binary parameter where the user can specify if
 there is or is not interaction in the data set. (using T/F or TRUE/FALSE)}

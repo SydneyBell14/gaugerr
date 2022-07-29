@@ -8,6 +8,8 @@
 #' for the measurements
 #' @param measurement a column of the data frame that has measurements of the
 #' object collected
+#' @param alpha the value for the confidence interval calculation (i.e. 95% CI
+#' would have alpha=0.05)
 #' @param interaction this is a binary parameter where the user can specify if
 #' there is or is not interaction in the data set. (using T/F or TRUE/FALSE)
 #' @param factor1 this tells the function that there is a factor in the data set
@@ -26,7 +28,7 @@
 #' @examples
 #' mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
 #' gauge_rr(mydata, P, O, Y, interaction=FALSE, factor1=mydata$P, factor2=mydata$O)
-gauge_rr <- function(data, part=P, operator=O, measurement=Y,
+gauge_rr <- function(data, part=P, operator=O, measurement=Y, alpha=0.05,
                      interaction=FALSE, factor1 = NULL, factor2 = NULL,
                      formula = NULL) {
   part_var <- rlang::enquo(part)
@@ -34,26 +36,39 @@ gauge_rr <- function(data, part=P, operator=O, measurement=Y,
   y_var <- rlang::enquo(measurement)
   # Function to determine if it is balanced
   if (is_balanced(data, !!part_var, !!oper_var) == TRUE){
-    if(is_interaction(interaction) == TRUE){
-      balanced_with_interaction(data, !!part_var, !!oper_var)
-    }else if (is_interaction(interaction) == FALSE){
-      balanced_no_interaction(data, !!part_var , !!oper_var)
+    #check if it has one or two factors
+    if(!is.null(factor1) && !is.null(factor2)){
+      #two factor and check for interaction
+      if(is_interaction(interaction) == TRUE){
+        #this is balanced_with_interaction
+        balanced_with_interaction(data, !!part_var, !!oper_var, !!y_var)
+      }else if(is_interaction(interaction) == FALSE)
+        #this is balanced_no_interaction
+        balanced_no_interaction(data, !!part_var , !!oper_var, !!y_var)
+    }else if (!is.null(factor1) | !is.null(factor2)){
+      #this is balanced_one_factor
+      balanced_one_factor(data, !!part_var, !!oper_var, !!y_var)
+    }else{
+      #this is an error
+      print("error")
     }
   }else{
-    if(is.null(formula)){
-      if(!is.null(factor1) && !is.null(factor2)){
-        unbalanced_two_factor(data, !!part_var, !!oper_var)
-      }else if(!is.null(factor1) && is.null(factor2)){
-        unbalanced_one_factor(data, !!part_var, !!oper_var)
-      }else if(is.null(factor1) && !is.null(factor2)){
-        print("unbalanced_one_factor")
-      }else if(is.null(factor1) && is.null(factor2)){
-        print("error")
-      }
+    #check if it has one or two factors
+    if(!is.null(factor1) && !is.null(factor2)){
+      #two factor and check for interaction
+      if(is_interaction(interaction) == TRUE){
+        #this is unbalanced_with_interaction
+        unbalanced_with_interaction(data, !!part_var, !!oper_var, !!y_var)
+      }else if(is_interaction(interaction) == FALSE)
+        #this is unbalanced_no_interaction
+        unbalanced_no_interaction(data, !!part_var , !!oper_var, !!y_var)
+    }else if (!is.null(factor1) | !is.null(factor2)){
+      #this is unbalanced_one_factor
+      unbalanced_one_factor(data, !!part_var, !!oper_var, !!y_var)
     }else{
-      print("input formula")
+      #this is an error
+      print("error")
     }
-
   }
 }
 

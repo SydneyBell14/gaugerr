@@ -1,4 +1,4 @@
-test_that("unbalanced_two_factor works", {
+test_that("unbalanced_no_interaction works", {
   data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,
                           4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,
                           7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,
@@ -85,12 +85,12 @@ test_that("unbalanced_two_factor works", {
                           0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,
                           0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,
                           0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
-
-  expect_error(unbalanced_two_factor(4))
-  expect_equal(unbalanced_two_factor(data1), structure(data.frame(
-    quantity = c("part", "gauge", "mu", "gamma_r"),
-    estimate = c(23357.35541838, 60523.82333333, 3.580000e+01, 0.57470448),
-    lower = c(11091.654241961, 44607.039072649, -124.774439948, 0.048863473),
-    upper = c(77658.9527754, 426285.1621202, 196.3744399, 1.3725212)
+  expect_error(unbalanced_no_interaction(3))
+  expect_equal(unbalanced_no_interaction(data1), structure(data.frame(
+    quantity = c("mu", "part", "gamma_m", "gamma_r"),
+    estimate = c(35.80, 16721.917, 66495.718, 0.0),
+    lower = c(-216.756414663, 4086.219492435, 50538.572954068, 0.017647362),
+    upper = c(288.3564147, 76162.5328450, 432155.2853245, 1.1357368)
   ), class = c("intervals_table", "data.frame")))
+
 })

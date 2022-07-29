@@ -1,4 +1,4 @@
-#' Unbalanced Two Factor Model
+#' Unbalanced Two Factor Model With Interaction
 #'
 #' @param data a data frame that contains measurements, operators and parts
 #' for a Gauge R&R analysis
@@ -20,8 +20,8 @@
 #'
 #' @examples
 #' mydata <- data.frame(P=c(1,1,2,2,3,3),O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
-#' unbalanced_two_factor(mydata, alpha=0.01)
-unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
+#' unbalanced_with_interaction(mydata, alpha=0.01)
+unbalanced_with_interaction <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
   # the model that we will be using for this study
   # Y_{ijk} = mu_Y + P_i + O_j + (PO)_{ij} + E_{ijk}
 
@@ -214,7 +214,7 @@ unbalanced_two_factor <- function(data, part=P, operator=O, measurement=Y, alpha
 
   #return statement for the data frame with estimate, lower and upper bounds of the CI
   table <- cbind(quantity, estimate.value, lower.bounds, upper.bounds)
-  unbal_two_factor <- structure(table, class = c("intervals_table", "data.frame"))
-  return(unbal_two_factor)
+  unbal_with_interaction <- structure(table, class = c("intervals_table", "data.frame"))
+  return(unbal_with_interaction)
 
 }

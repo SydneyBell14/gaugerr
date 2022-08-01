@@ -15,9 +15,7 @@
 #' class= c("intervals_table", "data.frame"))
 #' plot(mydf)
 plot.intervals_table <- function(x,...) {
-
   ggplot(data=x, mapping= aes(x=quantity, y= estimate)) +
     geom_pointrange(mapping = aes(ymin = lower, ymax = upper))
-
 }
 

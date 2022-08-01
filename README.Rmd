@@ -67,6 +67,6 @@ table <- gauge_rr(data1, P, O, Y, interaction=FALSE)
 plot(table)
 ```
 
-## Learning 
+## Learning  
 
 This package is intended to be very user friendly for individuals wanting to run Gauge R&R analysis. There are specific functions for particular calculations of interest and there are general functions that provide more of an overview. 

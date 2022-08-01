@@ -1018,7 +1018,7 @@ output$bal_one_factor_table <- renderTable({
                             0.0626,0.0631,0.0638,0.0645,0.0647,0.0670,0.0684,0.0679,0.0674,0.0696,0.0694,0.0712,0.7018,0.0746,0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
     data <- data2
   }
-  gaugerr::balanced_one_factor(data, input$alpha7)
+  gaugerr::balanced_one_factor(data, alpha = input$alpha11)
 })
 output$bal_one_factor_notes <- renderText({
   "*Notes*: a balanced data set is one in which the number of measurements is consistent for each
@@ -1058,7 +1058,7 @@ output$unbal_no_interact_table <- renderTable({
                             0.0626,0.0631,0.0638,0.0645,0.0647,0.0670,0.0684,0.0679,0.0674,0.0696,0.0694,0.0712,0.7018,0.0746,0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
     data <- data2
   }
-  gaugerr::unbalanced_no_interaction(data, input$alpha8)
+  gaugerr::unbalanced_no_interaction(data, alpha = input$alpha8)
 })
 
 }

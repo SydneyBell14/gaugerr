@@ -1,0 +1,90 @@
+---
+title: "Gauge R&R Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gauge R&R Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+
+- Never uses retina figures
+- Has a smaller default figure size
+- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+
+## Gauge R&R Info
+
+When working with Gauge R&R data, you want to know the capability of a measurement system. We can use statistical techniques to give a summary of confidence interval estimation for analysis of variance (ANOVA) models. These confidence intervals determine if the measurement system is capable of monitoring a manufacturing process. The package provides several functions for computing modified large sample (MLS) confidence intervals as well as a few modes of computing generalized confidence intervals (GCI), variance, mean sum of squares and point estimators. 
+
+To use any function in this package you must provide a data set of Gauge R&R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details needed to be provided. The functions that run the full analysis provide the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package. 
+
+## Data: example data set
+
+```{r}
+example <- data.frame(P=c(1,1,2,3,4,4,5,5,6,6,7,8,8,9,9,10,10), O=c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), Y=c(37,38,42,30,42,43,28,30,42,42,25,40,40,25,25,35,34))
+```
+
+Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use gauge_rr() which is the general function that can be run on any data set or we can use unbalanced_one_factor() which is more specific to the qualities in this data set. We will walk through both examples. 
+
+```{r}
+gaugerr::unbalanced_one_factor(example)
+```
+
+
+```{r}
+gaugerr::gauge_rr(example, factor1=example$P)
+```
+
+As expected the two functions produce the same desired output which confirms our observation that this is a one factor unbalanced data set.
+
+This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function plot() to graph the results from the data frame. The visual interpretation of the information can be valuable information. 
+
+```{r}
+table <- gaugerr::gauge_rr(example, factor1 = example$P)
+plot(table)
+```
+
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

@@ -19,8 +19,7 @@ Imports:
   rlang, 
   ggplot2
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0), knitr, rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-Suggests: knitr, rmarkdown
 URL: https://aloy.github.io/gaugerr/

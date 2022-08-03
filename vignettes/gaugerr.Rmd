@@ -14,11 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+The goal of the gaugerr package is to make Gauge R&R analysis more convient for users by running on the tidymodels framework. 
 
 ## Gauge R&R Info
 
@@ -29,18 +25,18 @@ To use any function in this package you must provide a data set of Gauge R&R dat
 ## Data: example data set
 
 ```{r}
-example <- data.frame(P=c(1,1,2,3,4,4,5,5,6,6,7,8,8,9,9,10,10), O=c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), Y=c(37,38,42,30,42,43,28,30,42,42,25,40,40,25,25,35,34))
+example1 <- data.frame(P=c(1,1,2,3,4,4,5,5,6,6,7,8,8,9,9,10,10), O=c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), Y=c(37,38,42,30,42,43,28,30,42,42,25,40,40,25,25,35,34))
 ```
 
 Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use gauge_rr() which is the general function that can be run on any data set or we can use unbalanced_one_factor() which is more specific to the qualities in this data set. We will walk through both examples. 
 
 ```{r}
-gaugerr::unbalanced_one_factor(example)
+gaugerr::unbalanced_one_factor(example1)
 ```
 
 
 ```{r}
-gaugerr::gauge_rr(example, factor1=example$P)
+gaugerr::gauge_rr(example1, factor1=example1$P)
 ```
 
 As expected the two functions produce the same desired output which confirms our observation that this is a one factor unbalanced data set.
@@ -48,10 +44,29 @@ As expected the two functions produce the same desired output which confirms our
 This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function plot() to graph the results from the data frame. The visual interpretation of the information can be valuable information. 
 
 ```{r}
-table <- gaugerr::gauge_rr(example, factor1 = example$P)
+table <- gaugerr::gauge_rr(example1, factor1 = example1$P)
 plot(table)
 ```
 
+
+Now that we understand an example that deals with one factor we will jump into a two factor with interaction data set next. The code below shows the construction of the data set. 
+
+
+```{r}
+example2 <- data.frame(P=c(1,2,3,4,1,2,3,4,1,2,3,4), 
+                       O=c(1,1,1,1,2,2,2,2,3,3,3,3),
+                       Y=c(4,2,3,3,4,2,3,3,5,2,3,3))
+```
+
+By observation we can tell that this is a balanced data set and we said above that it has interaction. This means we can run two functions on the code to get the confidence interval calculations. The two functions are `balanced_with_interaction()` and `gauge_rr()`. 
+
+```{r}
+gaugerr::balanced_with_interaction(example2)
+```
+
+```{r}
+gaugerr::gauge_rr(example2, interaction = TRUE, factor1 = example2$P, factor2 = example2$O)
+```
 
 The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
 

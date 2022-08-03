@@ -88,8 +88,8 @@ test_that("unbalanced_one_factor works", {
   expect_error(unbalanced_one_factor(5))
   expect_equal(unbalanced_one_factor(data1), structure(data.frame(
     quantity = c("part", "gauge", "mu", "gamma_r"),
-    estimate = c(296.9415549, 679.9360059, 49.5000000, 0.4367199),
-    lower = c(99.0921684, 555.7291338, 35.6936117, 0.1391001),
-    upper = c(1165.134973, 851.234652, 63.306388, 1.737608)
+    estimate = c(48.4843621, 0.9691358, 35.8000000, 48.3732510),
+    lower = c(22.8805708, 0.7271116, 30.8133905, 21.9042795),
+    upper = c(161.840333, 1.356545, 40.786609, 171.402459)
   ), class=c("intervals_table", "data.frame")))
 })

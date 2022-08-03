@@ -30,25 +30,6 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   p <- nrow(data |>
               group_by({{part}}) |>
               summarize(ybar = mean({{measurement}})))
-  o <- nrow(data |>
-              group_by({{operator}}) |>
-              summarize(ybar = mean({{measurement}})))
-  r <- n/(o*p) # change to r_h
-  N <- data |>
-    group_by({{part}}) |>
-    summarize(N = sum({{operator}})) |>
-    ungroup() |>
-    distinct() |>
-    summarize(N = sum(N)) |>
-    pull()
-  r_O <- data |>
-    group_by({{part}}) |>
-    summarise(summation = sum({{operator}}^2)) |>
-    ungroup()|>
-    distinct() |>
-    summarize(sum = sum(.data$summation)) |>
-    summarise(r_O = (N-.data$sum/N)/(p-1)) |>
-    pull()
   r_h <- data |>
     group_by({{part}}) |>
     summarize(reps = n()) |>
@@ -57,69 +38,73 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
     summarize(r_h = p/(sum(.data$frac))) |>
     pull()
 
-
   #i=1,...,p
   #j=1,...,r_i
-
 
   #calculation for s_p, s_e, ybarI, ybar, s_p_star, and ybar_star
   ybarI <- data |>
     group_by({{part}}) |>
-    summarise(ybarI = (sum({{measurement}}))/o) |>
-    ungroup()|>
-    distinct() |>
-    summarize(ybarI = mean(.data$ybarI)) |>
-    pull()
+    summarise(ybarI = mean({{measurement}}))
 
   ybar <- data |>
-    group_by({{part}}, {{operator}}) |>
-    summarize(ybar = (sum({{measurement}}))/N) |>
-    ungroup()|>
-    distinct() |>
-    summarize(ybar = mean(.data$ybar)) |>
+    summarize(ybar = mean({{measurement}})) |>
     pull()
 
   s_p <- data |>
     group_by({{part}}) |>
-    summarize(s_p1 = (sum({{operator}})*(ybarI-ybar)^2)/(p-1)) |>
+    mutate(ybarI = mean({{measurement}}),
+              num = n()) |>
     ungroup() |>
-    summarize(s_p = sum(.data$s_p1)) |>
+    mutate(ybar = mean({{measurement}})) |>
+    distinct() |>
+    summarize(s_p1 = sum(.data$num*(.data$ybarI-.data$ybar)^2)/(p-1)) |>
     pull()
 
   s_e <- data |>
-    group_by({{part}}, {{operator}}) |>
-    summarize(s_e1 = (sum(({{measurement}}-ybar)^2))/(N-p)) |>
+    group_by({{part}}) |>
+    mutate(ybarI = mean({{measurement}})) |>
     ungroup() |>
-    summarize(s_e = sum(.data$s_e1)) |>
+    group_by({{part}}, {{measurement}}) |>
+    summarize(s_e1 = (({{measurement}}-.data$ybarI)^2)) |>
+    ungroup() |>
+    distinct() |>
+    summarize(s_e = sum(.data$s_e1)/(n-p)) |>
     pull()
 
   ybar_star <- data |>
     group_by({{part}}) |>
-    summarize(ybar_star1 = (sum({{part}}))/p) |>
+    summarize(ybar_star1 = (mean({{measurement}}))) |>
     ungroup() |>
-    summarize(ybar_star = sum(.data$ybar_star1)) |>
+    summarize(ybar_star = (sum(.data$ybar_star1))/p) |>
     pull()
 
   s_p_star <- data |>
-    summarize(((sum((ybarI - ybar_star)^2))*r_h)/(p-1)) |>
+    group_by({{part}}) |>
+    summarize(ybar_star1 = (mean({{measurement}})),
+              ybarI = mean({{measurement}})) |>
+    ungroup() |>
+    mutate(ybar_star = (sum(.data$ybar_star1))/p) |>
+    summarize(s_p_star = (r_h * sum((.data$ybarI-.data$ybar_star)^2))/(p-1)) |>
     pull()
+
 
   #constants for the confidence interval calculation
   G1 <- 1- stats::qf(alpha/2, Inf, p-1)
-  G2 <- 1- stats::qf(alpha/2, Inf, N-p)
+  G2 <- 1- stats::qf(alpha/2, Inf, n-p)
   H1 <- stats::qf(1-alpha/2, Inf, p-1) -1
-  H2 <- stats::qf(1- alpha/2, Inf, N-p) -1
-  F1 <- stats::qf(1- alpha/2, p-1, N-p)
-  F2 <- stats::qf(alpha/2, p-1, N-p)
+  H2 <- stats::qf(1-alpha/2, Inf, n-p) -1
+  F1 <- stats::qf(1-alpha/2, p-1, n-p)
+  F2 <- stats::qf(alpha/2, p-1, n-p)
   G12 <- ((F1-1)^2 -G1^2 * F1^2 - H2^2)/F1
   H12 <- ((1-F2)^2 - H1^2 * F2^2 - G2^2)/F2
 
   #confidence interval for mu_y
+  mu_y <- ybar_star
   mu_lower <- ybar_star - sqrt((s_p_star*stats::qf(1-alpha, 1, p-1))/(p*r_h))
   mu_upper <- ybar_star + sqrt((s_p_star*stats::qf(1-alpha, 1, p-1))/(p*r_h))
 
   #confidence interval for gamma_p (USS modification)
-  gamma_p <- (s_p_star - s_e)/r_h
+  gamma_p <- pmax(0,(s_p_star - s_e)/r_h)
   v_lp <- G1^2*s_p_star^2 + H2^2*s_e^2 + G12*s_p_star*s_e
   v_up <- H1^2*s_p_star^2 + G2^2*s_e^2 + H12*s_p_star*s_e
   gamma_p_lower <- gamma_p - (sqrt(v_lp))/r_h
@@ -131,8 +116,9 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   gamma_m_upper <- (1+H2)*s_e
 
   #confidence interval for gamma_r
-  gamma_r_lower <- s_p_star/(r_h * s_e * F1) - 1/r_h
-  gamma_r_upper <- s_p_star/(r_h * s_e * F2) - 1/r_h
+  gamma_r <- ((s_p_star-s_e)-1)/r_h
+  gamma_r_lower <- s_p_star/(r_h * s_e * F1) - (1/r_h)
+  gamma_r_upper <- s_p_star/(r_h * s_e * F2) - (1/r_h)
 
   #confidence interval for PTR
 
@@ -141,7 +127,7 @@ unbalanced_one_factor <- function(data, part=P, operator=O,
   #confidence interval for C_p
 
   quantity <- c("part", "gauge", "mu", "gamma_r")
-  estimate <- c(gamma_p, gamma_m, ybar_star, gamma_p/gamma_m)
+  estimate <- c(gamma_p, gamma_m, mu_y, gamma_r)
   lower <- c(gamma_p_lower, gamma_m_lower, mu_lower, gamma_r_lower)
   upper <- c(gamma_p_upper, gamma_m_upper, mu_upper, gamma_r_upper)
 

@@ -94,10 +94,15 @@ and there are two options ("mls" or "gpq")</p></dd>
 <p>returns a data frame with the confidence intervals of the data that is
 passed into the function</p>
     </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&amp;R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>, Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2.1</span>,<span class="fl">2.2</span>,<span class="fl">1.9</span>,<span class="fl">2.3</span>,<span class="fl">1.8</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>, Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2.1</span>,<span class="fl">2.2</span>,<span class="fl">1.9</span>,<span class="fl">2.3</span>,<span class="fl">1.8</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">balanced_with_interaction</span><span class="op">(</span><span class="va">mydata</span>, part<span class="op">=</span><span class="va">P</span>, operator<span class="op">=</span><span class="va">O</span>, measurement<span class="op">=</span><span class="va">Y</span>, alpha<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NaNs produced</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NaNs produced</span>
@@ -123,8 +128,8 @@ passed into the function</p>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NaNs produced</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     quantity estimate lower     upper</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  s2_repeat      NaN    NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       s2_p        0     0 4.6725046</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       s2_o        0     0 0.6215921</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       s2_p        0     0 4.8186961</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       s2_o        0     0 0.6340493</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4      s2_po      NaN    NA        NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5     s2_tot      NaN    NA        NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6   s2_repro      NaN    NA        NA</span>
@@ -132,6 +137,7 @@ passed into the function</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8   pg_ratio      NaN    NA        NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9   gt_ratio      NaN    NA        NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10  pr_ratio      NaN    NA        NA</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

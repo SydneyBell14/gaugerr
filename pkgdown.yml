@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   gaugerr: gaugerr.html
-last_built: 2022-08-03T19:59Z
+last_built: 2022-08-03T20:48Z
 urls:
   reference: https://aloy.github.io/gaugerr/reference
   article: https://aloy.github.io/gaugerr/articles

@@ -26,6 +26,8 @@
 #' mydata <- data.frame(P=c(1,2), O=c(1,1), Y=c(5, 4))
 #' point_estimate(mydata)
 #' point_estimate(mydata, part=P, operator=O, measurement=Y)
+#'
+#' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 point_estimate <- function(data, part=P, operator=O, measurement=Y) {
 
   # calculations of n,p,r and o

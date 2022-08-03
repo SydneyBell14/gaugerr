@@ -21,6 +21,8 @@
 #' @examples
 #' mydata <- data.frame(P=c(1,1,2,2,3,3),O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 #' unbalanced_with_interaction(mydata, alpha=0.01)
+#'
+#' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 unbalanced_with_interaction <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
   # the model that we will be using for this study
   # Y_{ijk} = mu_Y + P_i + O_j + (PO)_{ij} + E_{ijk}

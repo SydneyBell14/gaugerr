@@ -23,6 +23,8 @@
 #' conf_intervals_gpq(mydata, alpha = 0.1)
 #' conf_intervals_gpq(mydata, N=1000)
 #' conf_intervals_gpq(mydata, part=P, operator=O, measurement=Y, alpha=0.01, N=1e4)
+#'
+#' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 conf_intervals_gpq <- function(data, part=P, operator=O, measurement=Y, alpha = 0.05, N=1e5) {
   #calculations for n, p, o, r based on the data frame
   n <- nrow(data)

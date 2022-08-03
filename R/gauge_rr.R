@@ -28,6 +28,9 @@
 #' @examples
 #' mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
 #' gauge_rr(mydata, P, O, Y, interaction=FALSE, factor1=mydata$P, factor2=mydata$O)
+#'
+#' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
+#'
 gauge_rr <- function(data, part=P, operator=O, measurement=Y, alpha=0.05,
                      interaction=FALSE, factor1 = NULL, factor2 = NULL,
                      formula = NULL) {

@@ -40,6 +40,11 @@ lower bounds for each estimate
 Balanced Without Interaction
 }
 \examples{
-mydata <- data.frame(P=c(1,1,1,2,2,2), O=c(1,2,3,1,2,3), Y=c(2,2.1,2.2,1.9,2.3,1.8))
+mydata <- data.frame(P=c(1,1,1,2,2,2),
+O=c(1,2,3,1,2,3), Y=c(2,2.1,2.2,1.9,2.3,1.8))
 balanced_no_interaction(mydata, alpha=0.05)
+
+}
+\references{
+Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 }

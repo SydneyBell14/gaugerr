@@ -21,6 +21,8 @@
 #' mean_ss(mydata, part=P, operator=O, measurement = Y)
 #'
 #' @import dplyr
+#'
+#' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 mean_ss <- function(data, part=P, operator=O, measurement=Y){
   #calculations for n,p,o, and r constants for the data set
   n <- nrow(data)

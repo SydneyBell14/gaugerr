@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-gaugerr is a package that uses common models to implement Gauge R&R analysis. This package was developed in the tidymodels framework. The user provides the data for the analysis and the choses the function to determine the type of input desired. 
+gaugerr is a package that uses common models to implement Gauge R&R analysis. This package was developed in the tidymodels framework. The user provides the data for the analysis and the chooses the function to determine the type of input desired. 
 
 ## Installation
 
@@ -70,3 +70,8 @@ plot(table)
 ## Learning  
 
 This package is intended to be very user friendly for individuals wanting to run Gauge R&R analysis. There are specific functions for particular calculations of interest and there are general functions that provide more of an overview. 
+
+## Reference 
+
+Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
+

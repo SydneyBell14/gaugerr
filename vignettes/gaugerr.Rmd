@@ -14,48 +14,62 @@ knitr::opts_chunk$set(
 )
 ```
 
-The goal of the gaugerr package is to make Gauge R&R analysis more convient for users by running on the tidymodels framework. 
+The gaugerr package makes it easier to run Gauge R&R analysis in R. This package was developed using the tidymodels framework. Below is a concise tour of how to use the package that explores some data sets and the outputs of the analysis functions. 
 
 ## Gauge R&R Info
 
 When working with Gauge R&R data, you want to know the capability of a measurement system. We can use statistical techniques to give a summary of confidence interval estimation for analysis of variance (ANOVA) models. These confidence intervals determine if the measurement system is capable of monitoring a manufacturing process. The package provides several functions for computing modified large sample (MLS) confidence intervals as well as a few modes of computing generalized confidence intervals (GCI), variance, mean sum of squares and point estimators. 
 
-To use any function in this package you must provide a data set of Gauge R&R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details needed to be provided. The functions that run the full analysis provide the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package. 
+To use any function in this package you must provide a data set of Gauge R&R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details provided. The functions that runs the full analysis provides the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package. 
 
-## Data: example data set
+## example1 data set
 
 ```{r}
 example1 <- data.frame(P=c(1,1,2,3,4,4,5,5,6,6,7,8,8,9,9,10,10), O=c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), Y=c(37,38,42,30,42,43,28,30,42,42,25,40,40,25,25,35,34))
 ```
 
-Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use gauge_rr() which is the general function that can be run on any data set or we can use unbalanced_one_factor() which is more specific to the qualities in this data set. We will walk through both examples. 
+Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use `gauge_rr()` which is the general function that can be run on any data set or we can use `unbalanced_one_factor()` which is more specific to the qualities in this data set. We will walk through both examples. 
 
 ```{r}
-gaugerr::unbalanced_one_factor(example1)
+gaugerr::unbalanced_one_factor(example1, 
+                               part=P, 
+                               operator=O,
+                               measurement=Y,
+                               alpha=0.05)
 ```
 
+In the code above I put in information for all the parameters. This is not necessary if the default parameters correspond to the correct information. If the column names in the data set are not P, O, and Y, be sure that you specify this when calling the function.
 
 ```{r}
-gaugerr::gauge_rr(example1, factor1=example1$P)
+gaugerr::gauge_rr(example1, part=P, operator=O,
+                  measurement=Y, interaction = FALSE, 
+                  factor1=example1$P, factor2 = NULL, 
+                  alpha = 0.05)
 ```
+
+For the `gauge_rr()`function there are more parameters that need to be filled in to run the appropriate analysis. Since the columns are named P, O and Y we do not need to specify that in the function because it is consistent with the defaults. Also the `interaction`, `factor2`, and `alpha` parameters are all set to their defaults. One important thing to note is how the `factor1` parameter is defined in the code above. It is not suffice enough to just call it P but instead you have to specify the entire column `(dataframe$column)`. 
 
 As expected the two functions produce the same desired output which confirms our observation that this is a one factor unbalanced data set.
 
-This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function plot() to graph the results from the data frame. The visual interpretation of the information can be valuable information. 
+This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function `plot()` to graph the results from the data frame. The visual interpretation of the information can be valuable information. 
 
 ```{r}
 table <- gaugerr::gauge_rr(example1, factor1 = example1$P)
 plot(table)
 ```
 
+In this analysis, the confidence intervals range in size so some of the ranges are not visible in the plot above. 
+
+## example2 data set
 
 Now that we understand an example that deals with one factor we will jump into a two factor with interaction data set next. The code below shows the construction of the data set. 
 
 
 ```{r}
-example2 <- data.frame(P=c(1,2,3,4,1,2,3,4,1,2,3,4), 
-                       O=c(1,1,1,1,2,2,2,2,3,3,3,3),
-                       Y=c(4,2,3,3,4,2,3,3,5,2,3,3))
+example2 <- data.frame(
+P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10),
+Y=c(37,38,37,41,41,40,41,42,41,42,41,43,42,42,42,43,42,43,30,31,31,31,31,31,29,30,28,42,43,42,43,43,43,42,42,42,28,30,29,29,30,29,31,29,29,42,42,43,45,45,45,44,46,45,25,26,27,28,28,30,29,27,27,40,40,40,43,42,42,43,43,41,25,25,25,27,29,28,26,26,26,35,34,34,35,35,34,35,34,35),
+O=c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3))
 ```
 
 By observation we can tell that this is a balanced data set and we said above that it has interaction. This means we can run two functions on the code to get the confidence interval calculations. The two functions are `balanced_with_interaction()` and `gauge_rr()`. 
@@ -64,42 +78,21 @@ By observation we can tell that this is a balanced data set and we said above th
 gaugerr::balanced_with_interaction(example2)
 ```
 
+The code above shows the minimal amount of information that needs to be inputted for the function to produce the analysis. In this case all of the default parameters provide the appropriate information.  
+
 ```{r}
 gaugerr::gauge_rr(example2, interaction = TRUE, factor1 = example2$P, factor2 = example2$O)
 ```
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+The code above also contains the minimal amount of information that needs to be provided for the function to run properly. 
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+As expected, the two functions output the same information which shows that our observations about the data set are correct. The plotting of this information gets a little messy but would be done in the same manner as in the example above. 
 
-## Figures
+## Further Directions
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+This package is still under development and there are several features that will hopefully be a part of future versions. I plan on including an option for the user to include a formula in the `gauge_rr()` that would represent the number of factors and whether there is interaction. I also plan on including more GCI confidence intervals and bayesian computations. The goal of this package is to have all the capabilities of Gauge R&R analysis that are available in excel and make it very user friendly. 
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
+## Reference 
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA models. Society for Industrial and Applied Mathematics, 2005.
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))

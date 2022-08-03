@@ -36,6 +36,11 @@ lower bounds for each estimate
 Unbalanced One Factor
 }
 \examples{
-mydata <- data.frame(P=c(1,1,2,2,3,3),O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
+mydata <- data.frame(P=c(1,1,2,2,3,3),
+O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 balanced_one_factor(mydata, alpha=0.01)
+
+}
+\references{
+Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 }

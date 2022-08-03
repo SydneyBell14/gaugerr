@@ -67,276 +67,100 @@
 
     
     
-<p>The goal of the gaugerr package is to make Gauge R&amp;R analysis more convient for users by running on the tidymodels framework.</p>
+<p>The gaugerr package makes it easier to run Gauge R&amp;R analysis in R. This package was developed using the tidymodels framework. Below is a concise tour of how to use the package that explores some data sets and the outputs of the analysis functions.</p>
 <div class="section level2">
 <h2 id="gauge-rr-info">Gauge R&amp;R Info<a class="anchor" aria-label="anchor" href="#gauge-rr-info"></a>
 </h2>
 <p>When working with Gauge R&amp;R data, you want to know the capability of a measurement system. We can use statistical techniques to give a summary of confidence interval estimation for analysis of variance (ANOVA) models. These confidence intervals determine if the measurement system is capable of monitoring a manufacturing process. The package provides several functions for computing modified large sample (MLS) confidence intervals as well as a few modes of computing generalized confidence intervals (GCI), variance, mean sum of squares and point estimators.</p>
-<p>To use any function in this package you must provide a data set of Gauge R&amp;R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details needed to be provided. The functions that run the full analysis provide the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package.</p>
+<p>To use any function in this package you must provide a data set of Gauge R&amp;R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details provided. The functions that runs the full analysis provides the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package.</p>
 </div>
 <div class="section level2">
-<h2 id="data-example-data-set">Data: example data set<a class="anchor" aria-label="anchor" href="#data-example-data-set"></a>
+<h2 id="example1-data-set">example1 data set<a class="anchor" aria-label="anchor" href="#example1-data-set"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">7</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">10</span><span class="op">)</span>, O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">37</span>,<span class="fl">38</span>,<span class="fl">42</span>,<span class="fl">30</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">28</span>,<span class="fl">30</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">25</span>,<span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">25</span>,<span class="fl">25</span>,<span class="fl">35</span>,<span class="fl">34</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use gauge_rr() which is the general function that can be run on any data set or we can use unbalanced_one_factor() which is more specific to the qualities in this data set. We will walk through both examples.</p>
+<p>Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use <code><a href="../reference/gauge_rr.html">gauge_rr()</a></code> which is the general function that can be run on any data set or we can use <code><a href="../reference/unbalanced_one_factor.html">unbalanced_one_factor()</a></code> which is more specific to the qualities in this data set. We will walk through both examples.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/unbalanced_one_factor.html">unbalanced_one_factor</a></span><span class="op">(</span><span class="va">example1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/unbalanced_one_factor.html">unbalanced_one_factor</a></span><span class="op">(</span><span class="va">example1</span>, </span>
+<span>                               part<span class="op">=</span><span class="va">P</span>, </span>
+<span>                               operator<span class="op">=</span><span class="va">O</span>,</span>
+<span>                               measurement<span class="op">=</span><span class="va">Y</span>,</span>
+<span>                               alpha<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   quantity estimate      lower      upper</span></span>
 <span><span class="co">#&gt; 1     part 49.24444 23.2170328 164.869489</span></span>
 <span><span class="co">#&gt; 2    gauge  0.50000  0.2185756   2.071166</span></span>
 <span><span class="co">#&gt; 3       mu 34.75000 29.7134888  39.786511</span></span>
 <span><span class="co">#&gt; 4  gamma_r 48.59444 19.9045152 415.440540</span></span></code></pre></div>
+<p>In the code above I put in information for all the parameters. This is not necessary if the default parameters correspond to the correct information. If the column names in the data set are not P, O, and Y, be sure that you specify this when calling the function.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/gauge_rr.html">gauge_rr</a></span><span class="op">(</span><span class="va">example1</span>, factor1<span class="op">=</span><span class="va">example1</span><span class="op">$</span><span class="va">P</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/gauge_rr.html">gauge_rr</a></span><span class="op">(</span><span class="va">example1</span>, part<span class="op">=</span><span class="va">P</span>, operator<span class="op">=</span><span class="va">O</span>,</span>
+<span>                  measurement<span class="op">=</span><span class="va">Y</span>, interaction <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                  factor1<span class="op">=</span><span class="va">example1</span><span class="op">$</span><span class="va">P</span>, factor2 <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>                  alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   quantity estimate      lower      upper</span></span>
 <span><span class="co">#&gt; 1     part 49.24444 23.2170328 164.869489</span></span>
 <span><span class="co">#&gt; 2    gauge  0.50000  0.2185756   2.071166</span></span>
 <span><span class="co">#&gt; 3       mu 34.75000 29.7134888  39.786511</span></span>
 <span><span class="co">#&gt; 4  gamma_r 48.59444 19.9045152 415.440540</span></span></code></pre></div>
+<p>For the <code><a href="../reference/gauge_rr.html">gauge_rr()</a></code>function there are more parameters that need to be filled in to run the appropriate analysis. Since the columns are named P, O and Y we do not need to specify that in the function because it is consistent with the defaults. Also the <code>interaction</code>, <code>factor2</code>, and <code>alpha</code> parameters are all set to their defaults. One important thing to note is how the <code>factor1</code> parameter is defined in the code above. It is not suffice enough to just call it P but instead you have to specify the entire column <code>(dataframe$column)</code>.</p>
 <p>As expected the two functions produce the same desired output which confirms our observation that this is a one factor unbalanced data set.</p>
-<p>This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function plot() to graph the results from the data frame. The visual interpretation of the information can be valuable information.</p>
+<p>This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> to graph the results from the data frame. The visual interpretation of the information can be valuable information.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/gauge_rr.html">gauge_rr</a></span><span class="op">(</span><span class="va">example1</span>, factor1 <span class="op">=</span> <span class="va">example1</span><span class="op">$</span><span class="va">P</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">table</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gaugerr_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p>In this analysis, the confidence intervals range in size so some of the ranges are not visible in the plot above.</p>
+</div>
+<div class="section level2">
+<h2 id="example2-data-set">example2 data set<a class="anchor" aria-label="anchor" href="#example2-data-set"></a>
+</h2>
 <p>Now that we understand an example that deals with one factor we will jump into a two factor with interaction data set next. The code below shows the construction of the data set.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">example2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>, </span>
-<span>                       O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>,</span>
-<span>                       Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">example2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">7</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span><span class="op">)</span>,</span>
+<span>Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">37</span>,<span class="fl">38</span>,<span class="fl">37</span>,<span class="fl">41</span>,<span class="fl">41</span>,<span class="fl">40</span>,<span class="fl">41</span>,<span class="fl">42</span>,<span class="fl">41</span>,<span class="fl">42</span>,<span class="fl">41</span>,<span class="fl">43</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">30</span>,<span class="fl">31</span>,<span class="fl">31</span>,<span class="fl">31</span>,<span class="fl">31</span>,<span class="fl">31</span>,<span class="fl">29</span>,<span class="fl">30</span>,<span class="fl">28</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">43</span>,<span class="fl">43</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">28</span>,<span class="fl">30</span>,<span class="fl">29</span>,<span class="fl">29</span>,<span class="fl">30</span>,<span class="fl">29</span>,<span class="fl">31</span>,<span class="fl">29</span>,<span class="fl">29</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">45</span>,<span class="fl">45</span>,<span class="fl">45</span>,<span class="fl">44</span>,<span class="fl">46</span>,<span class="fl">45</span>,<span class="fl">25</span>,<span class="fl">26</span>,<span class="fl">27</span>,<span class="fl">28</span>,<span class="fl">28</span>,<span class="fl">30</span>,<span class="fl">29</span>,<span class="fl">27</span>,<span class="fl">27</span>,<span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">43</span>,<span class="fl">42</span>,<span class="fl">42</span>,<span class="fl">43</span>,<span class="fl">43</span>,<span class="fl">41</span>,<span class="fl">25</span>,<span class="fl">25</span>,<span class="fl">25</span>,<span class="fl">27</span>,<span class="fl">29</span>,<span class="fl">28</span>,<span class="fl">26</span>,<span class="fl">26</span>,<span class="fl">26</span>,<span class="fl">35</span>,<span class="fl">34</span>,<span class="fl">34</span>,<span class="fl">35</span>,<span class="fl">35</span>,<span class="fl">34</span>,<span class="fl">35</span>,<span class="fl">34</span>,<span class="fl">35</span><span class="op">)</span>,</span>
+<span>O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>By observation we can tell that this is a balanced data set and we said above that it has interaction. This means we can run two functions on the code to get the confidence interval calculations. The two functions are <code><a href="../reference/balanced_with_interaction.html">balanced_with_interaction()</a></code> and <code><a href="../reference/gauge_rr.html">gauge_rr()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/balanced_with_interaction.html">balanced_with_interaction</a></span><span class="op">(</span><span class="va">example2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, Inf, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, Inf, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, (p - 1) * (o - 1), p * o * (r - 1)): NaNs</span></span>
-<span><span class="co">#&gt; produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, (p - 1) * (o - 1), p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, p - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, p - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, o - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, o - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt;                     quantity  estimate       lower      upper</span></span>
-<span><span class="co">#&gt; 1                     repeat       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 2                       part 0.8838735  0.26393736 12.6767398</span></span>
-<span><span class="co">#&gt; 3                   operator 0.0000000 -0.08776688  0.6643987</span></span>
-<span><span class="co">#&gt; 4  part operator interaction       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 5                      total       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 6                   s2_repro       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 7                      gauge       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 8                   pg_ratio       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 9                   tg_ratio       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 10                  pr_ratio       NaN         NaN        NaN</span></span></code></pre></div>
+<span><span class="co">#&gt;                     quantity     estimate        lower       upper</span></span>
+<span><span class="co">#&gt; 1                     repeat   0.51111111  0.368157535   0.7575430</span></span>
+<span><span class="co">#&gt; 2                       part  48.29259259 22.694519080 161.6391842</span></span>
+<span><span class="co">#&gt; 3                   operator   0.56460905  0.072961525  25.7507696</span></span>
+<span><span class="co">#&gt; 4  part operator interaction   0.72798354  0.332725386   1.7927202</span></span>
+<span><span class="co">#&gt; 5                      total  50.09629630 24.488435035 166.2206934</span></span>
+<span><span class="co">#&gt; 6                   s2_repro   1.29259259  0.612491664  26.4986366</span></span>
+<span><span class="co">#&gt; 7                      gauge   1.80370370  1.206225574  27.0172388</span></span>
+<span><span class="co">#&gt; 8                   pg_ratio 242.46132786  1.691679513 105.6089534</span></span>
+<span><span class="co">#&gt; 9                   tg_ratio   0.03600473  0.009380075   0.3715153</span></span>
+<span><span class="co">#&gt; 10                  pr_ratio  94.48550725 40.191991368 327.3236992</span></span></code></pre></div>
+<p>The code above shows the minimal amount of information that needs to be inputted for the function to produce the analysis. In this case all of the default parameters provide the appropriate information.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">gaugerr</span><span class="fu">::</span><span class="fu"><a href="../reference/gauge_rr.html">gauge_rr</a></span><span class="op">(</span><span class="va">example2</span>, interaction <span class="op">=</span> <span class="cn">TRUE</span>, factor1 <span class="op">=</span> <span class="va">example2</span><span class="op">$</span><span class="va">P</span>, factor2 <span class="op">=</span> <span class="va">example2</span><span class="op">$</span><span class="va">O</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, Inf, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, Inf, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, (p - 1) * (o - 1), p * o * (r - 1)): NaNs</span></span>
-<span><span class="co">#&gt; produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, (p - 1) * (o - 1), p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, p - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, p - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(1 - alpha/2, o - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning in stats::qf(alpha/2, o - 1, p * o * (r - 1)): NaNs produced</span></span>
-<span><span class="co">#&gt;                     quantity  estimate       lower      upper</span></span>
-<span><span class="co">#&gt; 1                     repeat       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 2                       part 0.8838735  0.26393736 12.6767398</span></span>
-<span><span class="co">#&gt; 3                   operator 0.0000000 -0.08776688  0.6643987</span></span>
-<span><span class="co">#&gt; 4  part operator interaction       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 5                      total       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 6                   s2_repro       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 7                      gauge       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 8                   pg_ratio       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 9                   tg_ratio       NaN         NaN        NaN</span></span>
-<span><span class="co">#&gt; 10                  pr_ratio       NaN         NaN        NaN</span></span></code></pre></div>
-<p>The <code>html_vignette</code> template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:</p>
-<pre><code><span><span class="va">output</span><span class="op">:</span> </span>
-<span>  <span class="fu">rmarkdown</span><span class="fu">::</span><span class="va"><a href="https://pkgs.rstudio.com/rmarkdown/reference/html_vignette.html" class="external-link">html_vignette</a></span><span class="op">:</span></span>
-<span>    <span class="va">css</span><span class="op">:</span> <span class="va">mystyles.css</span></span></code></pre>
+<span><span class="co">#&gt;                     quantity     estimate        lower       upper</span></span>
+<span><span class="co">#&gt; 1                     repeat   0.51111111  0.368157535   0.7575430</span></span>
+<span><span class="co">#&gt; 2                       part  48.29259259 22.694519080 161.6391842</span></span>
+<span><span class="co">#&gt; 3                   operator   0.56460905  0.072961525  25.7507696</span></span>
+<span><span class="co">#&gt; 4  part operator interaction   0.72798354  0.332725386   1.7927202</span></span>
+<span><span class="co">#&gt; 5                      total  50.09629630 24.488435035 166.2206934</span></span>
+<span><span class="co">#&gt; 6                   s2_repro   1.29259259  0.612491664  26.4986366</span></span>
+<span><span class="co">#&gt; 7                      gauge   1.80370370  1.206225574  27.0172388</span></span>
+<span><span class="co">#&gt; 8                   pg_ratio 242.46132786  1.691679513 105.6089534</span></span>
+<span><span class="co">#&gt; 9                   tg_ratio   0.03600473  0.009380075   0.3715153</span></span>
+<span><span class="co">#&gt; 10                  pr_ratio  94.48550725 40.191991368 327.3236992</span></span></code></pre></div>
+<p>The code above also contains the minimal amount of information that needs to be provided for the function to run properly.</p>
+<p>As expected, the two functions output the same information which shows that our observations about the data set are correct. The plotting of this information gets a little messy but would be done in the same manner as in the example above.</p>
 </div>
 <div class="section level2">
-<h2 id="figures">Figures<a class="anchor" aria-label="anchor" href="#figures"></a>
+<h2 id="further-directions">Further Directions<a class="anchor" aria-label="anchor" href="#further-directions"></a>
 </h2>
-<p>The figure sizes have been customised so that you can easily put two images side-by-side.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="gaugerr_files/figure-html/unnamed-chunk-8-1.png" width="700"><img src="gaugerr_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
-<p>You can enable figure captions by <code>fig_caption: yes</code> in YAML:</p>
-<pre><code><span><span class="va">output</span><span class="op">:</span></span>
-<span>  <span class="fu">rmarkdown</span><span class="fu">::</span><span class="va"><a href="https://pkgs.rstudio.com/rmarkdown/reference/html_vignette.html" class="external-link">html_vignette</a></span><span class="op">:</span></span>
-<span>    <span class="va">fig_caption</span><span class="op">:</span> <span class="va">yes</span></span></code></pre>
-<p>Then you can use the chunk option <code>fig.cap = "Your figure caption."</code> in <strong>knitr</strong>.</p>
+<p>This package is still under development and there are several features that will hopefully be a part of future versions. I plan on including an option for the user to include a formula in the <code><a href="../reference/gauge_rr.html">gauge_rr()</a></code> that would represent the number of factors and whether there is interaction. I also plan on including more GCI confidence intervals and bayesian computations. The goal of this package is to have all the capabilities of Gauge R&amp;R analysis that are available in excel and make it very user friendly.</p>
 </div>
 <div class="section level2">
-<h2 id="more-examples">More Examples<a class="anchor" aria-label="anchor" href="#more-examples"></a>
+<h2 id="reference">Reference<a class="anchor" aria-label="anchor" href="#reference"></a>
 </h2>
-<p>You can write math expressions, e.g. <span class="math inline">\(Y = X\beta + \epsilon\)</span>, footnotes<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;A footnote here.&lt;/p&gt;"><sup>1</sup></a>, and tables, e.g. using <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>.</p>
-<table class="table">
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">mpg</th>
-<th align="right">cyl</th>
-<th align="right">disp</th>
-<th align="right">hp</th>
-<th align="right">drat</th>
-<th align="right">wt</th>
-<th align="right">qsec</th>
-<th align="right">vs</th>
-<th align="right">am</th>
-<th align="right">gear</th>
-<th align="right">carb</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mazda RX4</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160.0</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.620</td>
-<td align="right">16.46</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="left">Mazda RX4 Wag</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160.0</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.875</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">Datsun 710</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">108.0</td>
-<td align="right">93</td>
-<td align="right">3.85</td>
-<td align="right">2.320</td>
-<td align="right">18.61</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Hornet 4 Drive</td>
-<td align="right">21.4</td>
-<td align="right">6</td>
-<td align="right">258.0</td>
-<td align="right">110</td>
-<td align="right">3.08</td>
-<td align="right">3.215</td>
-<td align="right">19.44</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Hornet Sportabout</td>
-<td align="right">18.7</td>
-<td align="right">8</td>
-<td align="right">360.0</td>
-<td align="right">175</td>
-<td align="right">3.15</td>
-<td align="right">3.440</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">Valiant</td>
-<td align="right">18.1</td>
-<td align="right">6</td>
-<td align="right">225.0</td>
-<td align="right">105</td>
-<td align="right">2.76</td>
-<td align="right">3.460</td>
-<td align="right">20.22</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Duster 360</td>
-<td align="right">14.3</td>
-<td align="right">8</td>
-<td align="right">360.0</td>
-<td align="right">245</td>
-<td align="right">3.21</td>
-<td align="right">3.570</td>
-<td align="right">15.84</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="left">Merc 240D</td>
-<td align="right">24.4</td>
-<td align="right">4</td>
-<td align="right">146.7</td>
-<td align="right">62</td>
-<td align="right">3.69</td>
-<td align="right">3.190</td>
-<td align="right">20.00</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">Merc 230</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">140.8</td>
-<td align="right">95</td>
-<td align="right">3.92</td>
-<td align="right">3.150</td>
-<td align="right">22.90</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">Merc 280</td>
-<td align="right">19.2</td>
-<td align="right">6</td>
-<td align="right">167.6</td>
-<td align="right">123</td>
-<td align="right">3.92</td>
-<td align="right">3.440</td>
-<td align="right">18.30</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-</tbody>
-</table>
-<p>Also a quote using <code>&gt;</code>:</p>
-<blockquote>
-<p>“He who gives up [code] safety for [code] speed deserves neither.” (<a href="https://twitter.com/hadleywickham/status/504368538874703872" class="external-link">via</a>)</p>
-</blockquote>
+<p>Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&amp;R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA models. Society for Industrial and Applied Mathematics, 2005.</p>
 </div>
-
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
 </div>

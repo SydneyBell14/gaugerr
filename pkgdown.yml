@@ -1,8 +1,9 @@
 pandoc: 2.14.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
-articles: {}
-last_built: 2022-08-01T17:45Z
+articles:
+  gaugerr: gaugerr.html
+last_built: 2022-08-03T02:03Z
 urls:
   reference: https://aloy.github.io/gaugerr/reference
   article: https://aloy.github.io/gaugerr/articles

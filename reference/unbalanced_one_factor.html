@@ -18,7 +18,10 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/gaugerr.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -90,11 +93,11 @@ lower bounds for each estimate</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>,O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5.3</span>, <span class="fl">6.5</span>, <span class="fl">5.4</span>, <span class="fl">6.4</span>, <span class="fl">6.9</span>, <span class="fl">5.8</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">unbalanced_one_factor</span><span class="op">(</span><span class="va">mydata</span>, alpha<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   quantity    estimate       lower     upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     part -12.5335802 -127.694986 401.29315</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    gauge  29.2696605    9.468509 259.89493</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       mu   4.0000000   -4.306191  12.30619</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  gamma_r  -0.4282106   -0.495064  13.80998</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   quantity   estimate       lower     upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     part  0.0000000 -12.4034857 13.310339</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    gauge  0.6083333   0.1421544 25.445550</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       mu  6.0500000   4.5612735  7.538726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  gamma_r -0.7366667  -0.4977719 21.599289</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

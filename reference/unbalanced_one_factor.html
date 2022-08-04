@@ -45,13 +45,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">unbalanced_one_factor</span><span class="op">(</span></span>
-<span>  <span class="va">data</span>,</span>
-<span>  part <span class="op">=</span> <span class="va">P</span>,</span>
-<span>  operator <span class="op">=</span> <span class="va">O</span>,</span>
-<span>  measurement <span class="op">=</span> <span class="va">Y</span>,</span>
-<span>  alpha <span class="op">=</span> <span class="fl">0.05</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">unbalanced_one_factor</span><span class="op">(</span><span class="va">data</span>, part <span class="op">=</span> <span class="va">P</span>, measurement <span class="op">=</span> <span class="va">Y</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -63,17 +57,12 @@ for a Gauge R&amp;R analysis</p></dd>
 
 <dt>part</dt>
 <dd><p>a column of the data frame that has the part labels for the
-measurements</p></dd>
-
-
-<dt>operator</dt>
-<dd><p>a column of the data frame that has the operator labels
-for the measurements</p></dd>
+measurements (this is can be specified by just the column name i.e. P)</p></dd>
 
 
 <dt>measurement</dt>
 <dd><p>a column of the data frame that has measurements of the
-object collected</p></dd>
+object collected (this is can be specified by just the column name i.e. Y)</p></dd>
 
 
 <dt>alpha</dt>
@@ -95,7 +84,7 @@ lower bounds for each estimate</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>,O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5.3</span>, <span class="fl">6.5</span>, <span class="fl">5.4</span>, <span class="fl">6.4</span>, <span class="fl">6.9</span>, <span class="fl">5.8</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>,Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5.3</span>, <span class="fl">6.5</span>, <span class="fl">5.4</span>, <span class="fl">6.4</span>, <span class="fl">6.9</span>, <span class="fl">5.8</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">unbalanced_one_factor</span><span class="op">(</span><span class="va">mydata</span>, alpha<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   quantity   estimate       lower     upper</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     part  0.0000000 -12.4034857 13.310339</span>

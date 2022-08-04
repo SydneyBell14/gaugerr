@@ -48,12 +48,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">gauge_rr</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  part <span class="op">=</span> <span class="va">P</span>,</span>
-<span>  operator <span class="op">=</span> <span class="va">O</span>,</span>
+<span>  operator <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  measurement <span class="op">=</span> <span class="va">Y</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  interaction <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  factor1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  factor2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formula <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -67,17 +65,17 @@ for a Gauge R&amp;R analysis</p></dd>
 
 <dt>part</dt>
 <dd><p>a column of the data frame that has the part labels for the
-measurements</p></dd>
+measurements (this is can be specified by just the column name i.e. P)</p></dd>
 
 
 <dt>operator</dt>
 <dd><p>a column of the data frame that has the operator labels
-for the measurements</p></dd>
+for the measurements (this is can be specified by just the column name i.e. O)</p></dd>
 
 
 <dt>measurement</dt>
 <dd><p>a column of the data frame that has measurements of the
-object collected</p></dd>
+object collected (this is can be specified by just the column name i.e. Y)</p></dd>
 
 
 <dt>alpha</dt>
@@ -90,18 +88,9 @@ would have alpha=0.05)</p></dd>
 there is or is not interaction in the data set. (using T/F or TRUE/FALSE)</p></dd>
 
 
-<dt>factor1</dt>
-<dd><p>this tells the function that there is a factor in the data set</p></dd>
-
-
-<dt>factor2</dt>
-<dd><p>this tells the function that there are multiple factors in the
-data set.</p></dd>
-
-
 <dt>formula</dt>
 <dd><p>the user is able to input a formula that determines how many
-factors the model has.</p></dd>
+factors the model has. This formula must have the lme4 format (i.e. y ~ (1 | P) + (1 | O))</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -119,15 +108,13 @@ interaction/no interaction)</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>, O<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">gauge_rr</span><span class="op">(</span><span class="va">mydata</span>, <span class="va">P</span>, <span class="va">O</span>, <span class="va">Y</span>, interaction<span class="op">=</span><span class="cn">FALSE</span>, factor1<span class="op">=</span><span class="va">mydata</span><span class="op">$</span><span class="va">P</span>, factor2<span class="op">=</span><span class="va">mydata</span><span class="op">$</span><span class="va">O</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   quantity   estimate     lower       upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   repeat  0.5416667 0.1738265    7.530285</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     part  5.5498047 0.9780031   80.602106</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 operator  8.5330404 1.8162263 8826.543798</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    total 14.6245117 6.6346472 8833.004064</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    gauge  9.0747070 2.1262196 8827.135866</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 pr_ratio 10.2457933 0.1960079  165.406262</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>P<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>, Y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">gauge_rr</span><span class="op">(</span><span class="va">mydata</span>, part <span class="op">=</span> <span class="va">P</span>, measurement <span class="op">=</span> <span class="va">Y</span>, interaction<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   quantity   estimate       lower      upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       mu 2.12500000  1.76185466  2.4881453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     part 0.02083333 -0.20222455  0.6881797</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  gamma_m 0.06250000  0.02243503  0.5160826</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  gamma_r 0.33333333 -0.41649296 12.0841491</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

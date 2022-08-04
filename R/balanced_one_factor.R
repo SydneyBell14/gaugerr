@@ -4,8 +4,6 @@
 #' for a Gauge R&R analysis
 #' @param part a column of the data frame that has the part labels for the
 #' measurements
-#' @param operator a column of the data frame that has the operator labels
-#' for the measurements
 #' @param measurement a column of the data frame that has measurements of the
 #' object collected
 #' @param alpha the value for the confidence interval calculation (i.e. 95% CI
@@ -21,11 +19,11 @@
 #'
 #' @examples
 #' mydata <- data.frame(P=c(1,1,2,2,3,3),
-#' O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
+#' O=c(1,1,1,1,1,1),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 #' balanced_one_factor(mydata, alpha=0.01)
 #'
 #' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
-balanced_one_factor <- function(data, part=P, operator=O, measurement=Y, alpha=0.05) {
+balanced_one_factor <- function(data, part=P, measurement=Y, alpha=0.05) {
   # the model for this is Y_{ij} = mu_y + P_i + E_{ij}
 
   #calculation for n, p, and r
@@ -45,7 +43,7 @@ balanced_one_factor <- function(data, part=P, operator=O, measurement=Y, alpha=0
     pull()
 
   y_bar <- data |>
-    group_by({{part}}, {{operator}}) |>
+    group_by({{part}}, {{measurement}}) |>
     summarise(y_bar = mean({{measurement}})) |>
     ungroup() |>
     summarise(y_bar = (sum(.data$y_bar))/(p*r)) |>
@@ -64,7 +62,7 @@ balanced_one_factor <- function(data, part=P, operator=O, measurement=Y, alpha=0
     group_by({{part}}) |>
     mutate(ybarI = mean({{measurement}})) |>
     ungroup() |>
-    group_by({{part}}, {{operator}}) |>
+    group_by({{part}}, {{measurement}}) |>
     mutate(yIJ = mean({{measurement}})) |>
     ungroup() |>
     summarise(se = (.data$yIJ - .data$ybarI)^2) |>

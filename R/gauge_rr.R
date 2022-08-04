@@ -12,72 +12,112 @@
 #' would have alpha=0.05)
 #' @param interaction this is a binary parameter where the user can specify if
 #' there is or is not interaction in the data set. (using T/F or TRUE/FALSE)
-#' @param factor1 this tells the function that there is a factor in the data set
-#' @param factor2 this tells the function that there are multiple factors in the
-#' data set.
 #' @param formula the user is able to input a formula that determines how many
-#' factors the model has.
+#' factors the model has. This formula must have the lme4 format (i.e. y ~ (1 | P) + (1 | O))
 #'
 #' @return a data frame with the confidence and point estimator values, for the
 #' appropriate analysis (balanced/unbalanced, one factor/two factor, and
 #' interaction/no interaction)
 #' @export
 #'
-#' @import dplyr
+#' @import dplyr, lme4
 #'
 #' @examples
 #' mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
-#' gauge_rr(mydata, P, O, Y, interaction=FALSE, factor1=mydata$P, factor2=mydata$O)
+#' gauge_rr(mydata, P, operator = mydata$O, Y, interaction=FALSE)
 #'
 #' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
 #'
-gauge_rr <- function(data, part=P, operator=O, measurement=Y, alpha=0.05,
-                     interaction=FALSE, factor1 = NULL, factor2 = NULL,
-                     formula = NULL) {
-  part_var <- rlang::enquo(part)
-  oper_var <- rlang::enquo(operator)
-  y_var <- rlang::enquo(measurement)
-  # Function to determine if it is balanced
-  if (is_balanced(data, !!part_var, !!oper_var) == TRUE){
-    #check if it has one or two factors
-    if(!is.null(factor1) && !is.null(factor2)){
-      #two factor and check for interaction
-      if(is_interaction(interaction) == TRUE){
-        #this is balanced_with_interaction
-        balanced_with_interaction(data, !!part_var, !!oper_var, !!y_var)
-      }else if(is_interaction(interaction) == FALSE)
-        #this is balanced_no_interaction
-        balanced_no_interaction(data, !!part_var , !!oper_var, !!y_var)
-    }else if (!is.null(factor1) | !is.null(factor2)){
-      #this is balanced_one_factor
-      balanced_one_factor(data, !!part_var, !!oper_var, !!y_var)
+gauge_rr <- function(data, part=P, operator=NULL, measurement=Y,
+                     alpha=0.05, interaction=FALSE, formula = NULL) {
+
+  if (is.null(operator)){ #one factor
+    part_var <- rlang::enquo(part)
+    y_var <- rlang::enquo(measurement)
+    if(is_balanced_one(data, !!part_var)){
+      balanced_one_factor(data, part = !!part_var, measurement = !!y_var, alpha = alpha)
     }else{
-      #this is an error
-      print("error")
+      unbalanced_one_factor(data, part = !!part_var, measurement = !!y_var, alpha = alpha)
     }
-  }else{
-    #check if it has one or two factors
-    if(!is.null(factor1) && !is.null(factor2)){
-      #two factor and check for interaction
-      if(is_interaction(interaction) == TRUE){
-        #this is unbalanced_with_interaction
-        unbalanced_with_interaction(data, !!part_var, !!oper_var, !!y_var)
-      }else if(is_interaction(interaction) == FALSE)
-        #this is unbalanced_no_interaction
-        unbalanced_no_interaction(data, !!part_var , !!oper_var, !!y_var)
-    }else if (!is.null(factor1) | !is.null(factor2)){
-      #this is unbalanced_one_factor
-      unbalanced_one_factor(data, !!part_var, !!oper_var, !!y_var)
+  }else{ #two factor
+    part_var <- rlang::enquo(part)
+    oper_var <- rlang::enquo(operator)
+    y_var <- rlang::enquo(measurement)
+    if(is_balanced_two(data, !!part_var, !!oper_var)){
+      if(!is.null(formula)){
+        len <- length(lme4::findbars(formula))
+        if (len == 3){
+          balanced_with_interaction(data, part = !!part_var,
+                                    operator = !!oper_var,
+                                    measurement = !!y_var,
+                                    alpha = alpha)
+        }else if(len == 2){
+          balanced_no_interaction(data, part = !!part_var,
+                                  operator = !!oper_var,
+                                  measurement = !!y_var,
+                                  alpha = alpha)
+        }
+      }else if(is_interaction(interaction) == TRUE){
+        balanced_with_interaction(data, part = !!part_var,
+                                  operator = !!oper_var,
+                                  measurement = !!y_var,
+                                  alpha = alpha)
+      }else if (is_interaction(interaction) == FALSE){
+        balanced_no_interaction(data, part = !!part_var,
+                                operator = !!oper_var,
+                                measurement = !!y_var,
+                                alpha = alpha)
+      }
     }else{
-      #this is an error
-      print("error")
+      if(!is.null(formula)){
+        len <- length(lme4::findbars(formula))
+        if (len == 3){
+          unbalanced_with_interaction(data, part = !!part_var,
+                                      operator = !!oper_var,
+                                      measurement = !!y_var,
+                                      alpha = alpha)
+        }
+        else if (len == 2){
+          unbalanced_no_interaction(data, part = !!part_var,
+                                    operator = !!oper_var,
+                                    measurement = !!y_var,
+                                    alpha = alpha)
+        }
+      }
+      if(is_interaction(interaction) == TRUE){
+        unbalanced_with_interaction(data, part = !!part_var,
+                                    operator = !!oper_var,
+                                    measurement = !!y_var,
+                                    alpha = alpha)
+      }else if(is_interaction(interaction) == FALSE){
+        unbalanced_no_interaction(data, part = !!part_var,
+                                  operator = !!oper_var,
+                                  measurement = !!y_var,
+                                  alpha = alpha)
+      }
     }
   }
 }
 
-#this function determines if the data is balanced or unbalanced
-is_balanced <- function(data, part=P, operator=O) {
+# this function determines if the data is balanced or unbalanced
+# a two factor model
+is_balanced_two <- function(data, part=P, operator=O) {
   total <- dplyr::count(data, {{part}}, {{operator}})
+  for (i in 1:length(total$n)){
+    if (sum(total$n)/length(total$n) == total$n[i]){
+      result <- TRUE
+    }else{
+      result <- FALSE
+      break
+    }
+  }
+  return(result)
+}
+
+# this function determines if the data is balanced or unbalanced
+# for a one factor model
+is_balanced_one <- function(data, part=P){
+  total <- dplyr::count(data, {{part}})
   for (i in 1:length(total$n)){
     if (sum(total$n)/length(total$n) == total$n[i]){
       result <- TRUE
@@ -97,21 +137,4 @@ is_interaction <- function(interaction){
     interact <- FALSE
   }
   return(interact)
-}
-
-#this determines if is one or two factors in the model and runs an error otherwise
-num_factors <- function(data, part=NULL, operator=NULL){
-  if (!is.null(part) && !is.null(operator)){
-    factors <- "two"
-    return(factors)
-  }else if(!is.null(part) && is.null(operator)){
-    factors <- "one"
-    return(factors)
-  }else if(is.null(part) && !is.null(operator)){
-    factors <- "one"
-    return(factors)
-  }else{
-    factors <- "error"
-    return(factors)
-  }
 }

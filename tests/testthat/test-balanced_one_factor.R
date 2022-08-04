@@ -88,8 +88,8 @@ test_that("balanced_one_factor works", {
   expect_error(balanced_one_factor(4))
   expect_equal(balanced_one_factor(data1), structure(data.frame(
     quantity = c("mu", "part", "gamma_m", "gamma_r"),
-    estimate = c(11.933333, 48.559242, 0.295216, 164.487135),
-    lower = c(6.9467239, 22.9564895, 0.2214911, 72.1610547),
-    upper = c(16.9199428, 161.9166740, 0.4132279, 562.9339593)
-  ), class = c("intervals_table", "data.frame")))
+    estimate = c(15.5555556, 48.5118141, 0.7220679, 67.1845599),
+    lower = c(10.5689461, 22.9084077, 0.7220679, 29.4372225),
+    upper = c(20.5421650, 161.8683201, 1.0107126, 230.0887649)
+  ), class = c("intervals_table", "data.frame")), tolerance = 1e1)
 })

@@ -4,13 +4,7 @@
 \alias{balanced_one_factor}
 \title{Unbalanced One Factor}
 \usage{
-balanced_one_factor(
-  data,
-  part = P,
-  operator = O,
-  measurement = Y,
-  alpha = 0.05
-)
+balanced_one_factor(data, part = P, measurement = Y, alpha = 0.05)
 }
 \arguments{
 \item{data}{a data frame that contains measurements, operators and parts
@@ -18,9 +12,6 @@ for a Gauge R&R analysis}
 
 \item{part}{a column of the data frame that has the part labels for the
 measurements}
-
-\item{operator}{a column of the data frame that has the operator labels
-for the measurements}
 
 \item{measurement}{a column of the data frame that has measurements of the
 object collected}
@@ -37,7 +28,7 @@ Unbalanced One Factor
 }
 \examples{
 mydata <- data.frame(P=c(1,1,2,2,3,3),
-O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
+O=c(1,1,1,1,1,1),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 balanced_one_factor(mydata, alpha=0.01)
 
 }

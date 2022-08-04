@@ -7,12 +7,10 @@
 gauge_rr(
   data,
   part = P,
-  operator = O,
+  operator = NULL,
   measurement = Y,
   alpha = 0.05,
   interaction = FALSE,
-  factor1 = NULL,
-  factor2 = NULL,
   formula = NULL
 )
 }
@@ -35,13 +33,8 @@ would have alpha=0.05)}
 \item{interaction}{this is a binary parameter where the user can specify if
 there is or is not interaction in the data set. (using T/F or TRUE/FALSE)}
 
-\item{factor1}{this tells the function that there is a factor in the data set}
-
-\item{factor2}{this tells the function that there are multiple factors in the
-data set.}
-
 \item{formula}{the user is able to input a formula that determines how many
-factors the model has.}
+factors the model has. This formula must have the lme4 format (i.e. y ~ (1 | P) + (1 | O))}
 }
 \value{
 a data frame with the confidence and point estimator values, for the
@@ -53,7 +46,7 @@ General Gauge R&R Analysis Function
 }
 \examples{
 mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
-gauge_rr(mydata, P, O, Y, interaction=FALSE, factor1=mydata$P, factor2=mydata$O)
+gauge_rr(mydata, P, operator = mydata$O, Y, interaction=FALSE)
 
 }
 \references{

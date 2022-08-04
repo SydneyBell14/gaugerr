@@ -4,26 +4,17 @@
 \alias{unbalanced_one_factor}
 \title{Unbalanced One Factor Model}
 \usage{
-unbalanced_one_factor(
-  data,
-  part = P,
-  operator = O,
-  measurement = Y,
-  alpha = 0.05
-)
+unbalanced_one_factor(data, part = P, measurement = Y, alpha = 0.05)
 }
 \arguments{
 \item{data}{a data frame that contains measurements, operators and parts
 for a Gauge R&R analysis}
 
 \item{part}{a column of the data frame that has the part labels for the
-measurements}
-
-\item{operator}{a column of the data frame that has the operator labels
-for the measurements}
+measurements (this is can be specified by just the column name i.e. P)}
 
 \item{measurement}{a column of the data frame that has measurements of the
-object collected}
+object collected (this is can be specified by just the column name i.e. Y)}
 
 \item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
 would have alpha=0.05)}
@@ -36,7 +27,7 @@ lower bounds for each estimate
 Unbalanced One Factor Model
 }
 \examples{
-mydata <- data.frame(P=c(1,1,2,2,3,3),O=c(1,2,1,2,1,2),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
+mydata <- data.frame(P=c(1,1,2,2,3,3),Y=c(5.3, 6.5, 5.4, 6.4, 6.9, 5.8))
 unbalanced_one_factor(mydata, alpha=0.01)
 
 }

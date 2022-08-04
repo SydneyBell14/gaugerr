@@ -17,7 +17,8 @@ Imports:
   dplyr, 
   stringr,
   rlang, 
-  ggplot2
+  ggplot2, 
+  lme4
 Suggests: 
     testthat (>= 3.0.0), knitr, rmarkdown
 Config/testthat/edition: 3

@@ -2,11 +2,11 @@
 #'
 #' @param data a data frame consisting of gauge R&R data to run the analysis
 #' @param part a column of the data frame that has the part labels for the
-#' measurements
+#' measurements (this is can be specified by just the column name i.e. P)
 #' @param operator a column of the data frame that has the operator labels
-#' for the measurements
+#' for the measurements (this is can be specified by just the column name i.e. O)
 #' @param measurement a column of the data frame that has measurements of the
-#' object collected
+#' object collected (this is can be specified by just the column name i.e. Y)
 #'
 #' @return a list of the point estimates
 #' s_p: the point estimate for parts

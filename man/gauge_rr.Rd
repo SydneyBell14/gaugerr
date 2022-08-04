@@ -19,13 +19,13 @@ gauge_rr(
 for a Gauge R&R analysis}
 
 \item{part}{a column of the data frame that has the part labels for the
-measurements}
+measurements (this is can be specified by just the column name i.e. P)}
 
 \item{operator}{a column of the data frame that has the operator labels
-for the measurements}
+for the measurements (this is can be specified by just the column name i.e. O)}
 
 \item{measurement}{a column of the data frame that has measurements of the
-object collected}
+object collected (this is can be specified by just the column name i.e. Y)}
 
 \item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
 would have alpha=0.05)}
@@ -45,8 +45,8 @@ interaction/no interaction)
 General Gauge R&R Analysis Function
 }
 \examples{
-mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), O=c(1,2,1,2,1,2,1,2), Y=c(2,2,2,3,3,2,3,2))
-gauge_rr(mydata, P, operator = mydata$O, Y, interaction=FALSE)
+mydata <- data.frame(P=c(1,2,3,4,1,2,3,4), Y=c(2,2,2,3,3,2,3,2))
+gauge_rr(mydata, part = P, measurement = Y, interaction=FALSE)
 
 }
 \references{

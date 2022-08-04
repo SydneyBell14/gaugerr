@@ -20,7 +20,7 @@ The gaugerr package makes it easier to run Gauge R&R analysis in R. This package
 
 When working with Gauge R&R data, you want to know the capability of a measurement system. We can use statistical techniques to give a summary of confidence interval estimation for analysis of variance (ANOVA) models. These confidence intervals determine if the measurement system is capable of monitoring a manufacturing process. The package provides several functions for computing modified large sample (MLS) confidence intervals as well as a few modes of computing generalized confidence intervals (GCI), variance, mean sum of squares and point estimators. 
 
-To use any function in this package you must provide a data set of Gauge R&R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details provided. The functions that runs the full analysis provides the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package. 
+To use any function in this package you must provide a data set of Gauge R&R data for analysis. The gaugerr package makes it easy to run the analysis with a minimal amount of details provided. The functions that run the full analysis provide the user with confidence intervals and point estimator calculations as well as the opportunity to graph these values. There are also functions for specific calculations and this document will highlight some important features of the package. 
 
 ## example1 data set
 
@@ -50,11 +50,11 @@ gaugerr::gauge_rr(example1, part = P,
                   alpha = 0.05)
 ```
 
-For the `gauge_rr()` function there are more parameters that need to be filled in to run the appropriate analysis. Since the columns are named P, O and Y we do not need to specify that in the function because it is consistent with the defaults. Also the `interaction`, `factor2`, and `alpha` parameters are all set to their defaults. One important thing to note is how the `factor1` parameter is defined in the code above. It is not suffice enough to just call it P but instead you have to specify the entire column `(dataframe$column)`. 
+For the `gauge_rr()` function there are more parameters that need to be filled in to run the appropriate analysis. Since the columns are named P, O and Y we do not need to specify that in the function because it is consistent with the defaults. Also the `interaction`, and `alpha` parameters are all set to their defaults. One important thing to note is that there is a also a formula parameter that can be defined and determine the whether there is interaction. The formula must be defined in lme4 format (i.e. `y ~ (1 | P) + (1 | O)` which shows that there are two factors and no interaction). 
 
 As expected the two functions produce the same desired output which confirms our observation that this is a one factor unbalanced data set.
 
-This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function `plot()` to graph the results from the data frame. The visual interpretation of the information can be valuable information. 
+This package utilizes object oriented programming. The mechanics behind this idea can be a little complicated but it allows us to use the function `plot()` to graph the results from the data frame. The visual interpretation of the data frame can be valuable information. 
 
 ```{r}
 table <- gaugerr::gauge_rr(example1)
@@ -67,24 +67,23 @@ In this analysis, the confidence intervals range in size so some of the ranges a
 
 Now that we understand an example that deals with one factor we will jump into a two factor with interaction data set next. The code below shows the construction of the data set. 
 
-
 ```{r}
 example2 <- data.frame(
   P = c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10),
   Y = c(37,38,37,41,41,40,41,42,41,42,41,43,42,42,42,43,42,43,30,31,31,31,31,31,29,30,28,42,43,42,43,43,43,42,42,42,28,30,29,29,30,29,31,29,29,42,42,43,45,45,45,44,46,45,25,26,27,28,28,30,29,27,27,40,40,40,43,42,42,43,43,41,25,25,25,27,29,28,26,26,26,35,34,34,35,35,34,35,34,35),
-  Z = c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3))
+  O = c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3))
 ```
 
 By observation we can tell that this is a balanced data set and we said above that it has interaction. This means we can run two functions on the code to get the confidence interval calculations. The two functions are `balanced_with_interaction()` and `gauge_rr()`. 
 
 ```{r}
-gaugerr::balanced_with_interaction(example2, operator = example2$Z)
+gaugerr::balanced_with_interaction(example2)
 ```
 
 The code above shows the minimal amount of information that needs to be inputted for the function to produce the analysis. In this case all of the default parameters provide the appropriate information.  
 
 ```{r}
-gaugerr::gauge_rr(example2, operator = example2$Z,
+gaugerr::gauge_rr(example2, operator = example2$O,
                   interaction = TRUE)
 ```
 
@@ -94,7 +93,7 @@ As expected, the two functions output the same information which shows that our 
 
 ## Further Directions
 
-This package is still under development and there are several features that will hopefully be a part of future versions. I plan on including an option for the user to include a formula in the `gauge_rr()` that would represent the number of factors and whether there is interaction. I also plan on including more GCI confidence intervals and bayesian computations. The goal of this package is to have all the capabilities of Gauge R&R analysis that are available in excel and make it very user friendly. 
+This package is still under development and there are several features that will hopefully be a part of future versions. I plan on expanding the formula option in the `gauge_rr()` function so that a user would only need to provide a data set and a formula. I also plan on including more GCI confidence intervals and bayesian computations. The goal of this package is to have all the capabilities of Gauge R&R analysis that are available in excel and make it very user friendly. 
 
 ## Reference 
 

@@ -11,13 +11,13 @@ gauge_variance_per(data, part = P, operator = O, measurement = Y)
 for a Gauge R&R analysis}
 
 \item{part}{a column of the data frame that has the part labels for the
-measurements}
+measurements (this is can be specified by just the column name i.e. P)}
 
 \item{operator}{a column of the data frame that has the operator labels
-for the measurements}
+for the measurements (this is can be specified by just the column name i.e. O)}
 
 \item{measurement}{a column of the data frame that has measurements of the
-object collected}
+object collected (this is can be specified by just the column name i.e. Y)}
 }
 \value{
 returns a data frame with the values of the percent of variance contribution

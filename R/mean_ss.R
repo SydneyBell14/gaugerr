@@ -3,11 +3,11 @@
 #' @param data a data frame that contains measurements, operators and parts
 #' for a Gauge R&R analysis
 #' @param part a column of the data frame that has the part labels for the
-#' measurements
+#' measurements (this is can be specified by just the column name i.e. P)
 #' @param operator a column of the data frame that has the operator labels
-#' for the measurements
+#' for the measurements (this is can be specified by just the column name i.e. O)
 #' @param measurement a column of the data frame that has measurements of the
-#' object collected
+#' object collected (this is can be specified by just the column name i.e. Y)
 #'
 #' @return The 4 mean sum of square values
 #' MSE: which considers both part and operator

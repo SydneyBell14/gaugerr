@@ -34,7 +34,7 @@ devtools::install_github("aloy/gaugerr")
 
 ## Usage
 
-There are several ways to use this package as it has different functions depending on the calculations of interest. One highlight function of the package is `gauge_rr()`. When a data set and specific parameters (part, operator, measurement, interaction, factor1 and factor2) are passed into the function, and it decides the type of analysis needed given the information. 
+There are several ways to use this package as it has different functions depending on the calculations of interest. One highlight function of the package is `gauge_rr()`. When a data set and specific parameters (part, operator, measurement, interaction, and formula) are passed into the function, and it decides the type of analysis needed given the information. 
 
 ```{r, include=FALSE}
 data1 <- data.frame(P=c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,
@@ -58,7 +58,6 @@ library(gaugerr)
 gauge_rr(data1, P, O, Y, interaction=FALSE)
 ```
 
-The table above gives information about the point estimator of the quantity and the upper and lower bounds for the confidence intervals. This function will always return an object with these same columns and the object can be plotted to show these values visually.  
 
 The figure below plots the information from the table of values. The points are the values of point estimators and the line segments show the range for the upper and lower bounds of the confidence interval.
 

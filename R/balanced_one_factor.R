@@ -3,9 +3,9 @@
 #' @param data a data frame that contains measurements, operators and parts
 #' for a Gauge R&R analysis
 #' @param part a column of the data frame that has the part labels for the
-#' measurements
+#' measurements (this is can be specified by just the column name i.e. P)
 #' @param measurement a column of the data frame that has measurements of the
-#' object collected
+#' object collected (this is can be specified by just the column name i.e. Y)
 #' @param alpha the value for the confidence interval calculation (i.e. 95% CI
 #' would have alpha=0.05)
 #'
@@ -23,6 +23,7 @@
 #' balanced_one_factor(mydata, alpha=0.01)
 #'
 #' @references Burdick, Richard K., Connie M. Borror, and Douglas C. Montgomery. Design and Analysis of Gauge R&R Studies: Making Decisions with Confidence Intervals in Random and Mixed ANOVA Models. Society for Industrial and Applied Mathematics, 2005.
+
 balanced_one_factor <- function(data, part=P, measurement=Y, alpha=0.05) {
   # the model for this is Y_{ij} = mu_y + P_i + E_{ij}
 

@@ -11,10 +11,10 @@ balanced_one_factor(data, part = P, measurement = Y, alpha = 0.05)
 for a Gauge R&R analysis}
 
 \item{part}{a column of the data frame that has the part labels for the
-measurements}
+measurements (this is can be specified by just the column name i.e. P)}
 
 \item{measurement}{a column of the data frame that has measurements of the
-object collected}
+object collected (this is can be specified by just the column name i.e. Y)}
 
 \item{alpha}{the value for the confidence interval calculation (i.e. 95\% CI
 would have alpha=0.05)}

@@ -26,9 +26,10 @@ To use any function in this package you must provide a data set of Gauge R&R dat
 
 ```{r}
 example1 <- data.frame(
-  P = c(1,1,2,3,4,4,5,5,6,6,7,8,8,9,9,10,10),
-  O = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
-  Y = c(37,38,42,30,42,43,28,30,42,42,25,40,40,25,25,35,34))
+  P = c(1, 1, 2, 3, 4, 4, 5, 5, 6, 6, 7,8,8,9,9,10,10), 
+  O = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), 
+  Y = c(37,38,42,30,42,43,28,30,42,42,25,40,40,25,25,35,34)
+)
 ```
 
 Based on observation we can see that this data set is unbalanced and only has one factor, so this gives us two options for functions. We can use `gauge_rr()` which is the general function that can be run on any data set or we can use `unbalanced_one_factor()` which is more specific to the qualities in this data set. We will walk through both examples. 

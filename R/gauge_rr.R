@@ -33,7 +33,8 @@
 gauge_rr <- function(data, part=P, operator=NULL, measurement=Y,
                      alpha=0.05, interaction=FALSE, formula = NULL) {
 
-  if (is.null(operator)){ #one factor
+  operator <- rlang::enquo(operator)
+  if (rlang::quo_is_null(operator)){ #one factor
     #setting to part to something that can be passed into a function
     part_var <- rlang::enquo(part)
     #setting measurement to something that can be passed into a function

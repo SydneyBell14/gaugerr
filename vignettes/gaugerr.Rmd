@@ -83,7 +83,7 @@ gaugerr::balanced_with_interaction(example2)
 The code above shows the minimal amount of information that needs to be inputted for the function to produce the analysis. In this case all of the default parameters provide the appropriate information.  
 
 ```{r}
-gaugerr::gauge_rr(example2, operator = example2$O,
+gaugerr::gauge_rr(example2, operator = O,
                   interaction = TRUE)
 ```
 

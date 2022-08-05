@@ -263,16 +263,6 @@ ui <- navbarPage(title = "gaugerr",
                            inputId = "interact",
                            label = "Is there interaction in the data set?",
                            choices = c(TRUE, FALSE)
-                         ), #end radioButtons
-                         radioButtons(
-                           inputId = "factor1",
-                           label = "Is factor 1 present?",
-                           choices = c("yes", "no")
-                         ),#end radioButtons
-                         radioButtons(
-                           inputId = "factor2",
-                           label = "Is factor 2 present?",
-                           choices = c("yes", "no")
                          ) #end radioButtons
                        ), #end sidebarPanel
                        mainPanel(
@@ -696,8 +686,8 @@ output$gauge_rr <- renderText({
   shown below with the associated defaults."
 })
 output$gauge_rr_fun <- renderText({
-  "gauge_rr(data, part=P, operator=O, measurement=Y,
-            interaction=FALSE, factor1=NULL, factor2=NULL)"
+  "gauge_rr(data, part = P, operator = NULL, measurement = Y,
+            interaction = FALSE, formula = NULL)"
 })
 output$gauge_rr_table <- renderTable({
   if(input$dataInput4 == "data1"){
@@ -721,18 +711,7 @@ output$gauge_rr_table <- renderTable({
                             0.0626,0.0631,0.0638,0.0645,0.0647,0.0670,0.0684,0.0679,0.0674,0.0696,0.0694,0.0712,0.7018,0.0746,0.0755,0.0793,0.0801,0.0809,0.0823,0.0876,0.0886,0.0915,0.0934,0.0932,0.0954,0.0985,0.9582,0.1385,0.1100,0.1144,0.1213,0.1242,0.1363,0.1519,0.1556,0.1757))
     data <- data2
   }
-  if(input$factor1 == "no"){
-    fact1 <- NULL
-  }else{
-    fact1 <- "yes"
-  }
-
-  if(input$factor2 == "no"){
-    fact2 <- NULL
-  }else{
-    fact2 <- "yes"
-  }
-  gaugerr::gauge_rr(data, interaction = input$interact, factor1=fact1, factor2=fact2)
+  gaugerr::gauge_rr(data, interaction = input$interact)
 })
 output$gauge_rr_notes <- renderText({
   "*Note* As I keep working on this, I hope to include a formula input. This will be written
